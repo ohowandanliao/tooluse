@@ -1,0 +1,15 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "What is the weather in Shanghai tomorrow?"
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"city\":\"Shanghai\",\"day\":\"tomorrow\"},\"name\":\"weather_lookup\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for weather_lookup.\", \"name\": \"weather_lookup\", \"parameters\": {\"properties\": {\"city\": {\"description\": \"Argument `city`.\", \"type\": \"string\"}, \"day\": {\"description\": \"Argument `day`.\", \"type\": \"string\"}}, \"required\": [\"city\", \"day\"], \"type\": \"object\"}}]"
+  }
+]

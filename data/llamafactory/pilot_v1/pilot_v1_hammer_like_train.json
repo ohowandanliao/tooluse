@@ -1,0 +1,28 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "What is the weather in Shanghai tomorrow?"
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"city\":\"Shanghai\",\"day\":\"tomorrow\"},\"name\":\"weather_lookup\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for weather_lookup.\", \"name\": \"weather_lookup\", \"parameters\": {\"properties\": {\"city\": {\"description\": \"Argument `city`.\", \"type\": \"string\"}, \"day\": {\"description\": \"Argument `day`.\", \"type\": \"string\"}}, \"required\": [\"city\", \"day\"], \"type\": \"object\"}}, {\"description\": \"Tool schema for irrelevant_tool_0.\", \"name\": \"irrelevant_tool_0\", \"parameters\": {\"properties\": {\"unused_arg_0\": {\"description\": \"Argument `unused_arg_0`.\", \"type\": \"string\"}}, \"required\": [\"unused_arg_0\"], \"type\": \"object\"}}, {\"description\": \"Tool schema for irrelevant_tool_1.\", \"name\": \"irrelevant_tool_1\", \"parameters\": {\"properties\": {\"unused_arg_1\": {\"description\": \"Argument `unused_arg_1`.\", \"type\": \"string\"}}, \"required\": [\"unused_arg_1\"], \"type\": \"object\"}}]"
+  },
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "What is the weather in Shanghai tomorrow?"
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"train_arg_0000\":\"tomorrow\",\"train_arg_0001\":\"Shanghai\"},\"name\":\"train_tool_0000\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for train_tool_0000.\", \"name\": \"train_tool_0000\", \"parameters\": {\"properties\": {\"train_arg_0000\": {\"description\": \"Argument `train_arg_0000`.\", \"type\": \"string\"}, \"train_arg_0001\": {\"description\": \"Argument `train_arg_0001`.\", \"type\": \"string\"}}, \"required\": [\"train_arg_0001\", \"train_arg_0000\"], \"type\": \"object\"}}, {\"description\": \"Tool schema for irrelevant_tool_0.\", \"name\": \"irrelevant_tool_0\", \"parameters\": {\"properties\": {\"unused_arg_0\": {\"description\": \"Argument `unused_arg_0`.\", \"type\": \"string\"}}, \"required\": [\"unused_arg_0\"], \"type\": \"object\"}}, {\"description\": \"Tool schema for irrelevant_tool_1.\", \"name\": \"irrelevant_tool_1\", \"parameters\": {\"properties\": {\"unused_arg_1\": {\"description\": \"Argument `unused_arg_1`.\", \"type\": \"string\"}}, \"required\": [\"unused_arg_1\"], \"type\": \"object\"}}]"
+  }
+]

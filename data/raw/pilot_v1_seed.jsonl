@@ -1,0 +1,3 @@
+{"user": "What is the weather in Shanghai tomorrow?", "ground_truth": {"name": "weather_lookup", "arguments": {"city": "Shanghai", "day": "tomorrow"}}, "metadata": {"single_turn": true, "ast_verifiable": true}}
+{"user": "call weather_lookup for Shanghai tomorrow", "ground_truth": {"name": "weather_lookup", "arguments": {"city": "Shanghai", "day": "tomorrow"}}, "metadata": {"single_turn": true, "ast_verifiable": true}}
+{"user": "Book me a train from Beijing to Hangzhou.", "ground_truth": {"name": "train_book", "arguments": {"departure_city": "Beijing", "arrival_city": "Hangzhou"}}, "metadata": {"single_turn": true, "executable": true}}

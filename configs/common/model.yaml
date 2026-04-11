@@ -1,0 +1,7 @@
+{
+  "backbone_model_id": "Qwen/Qwen2.5-7B-Instruct",
+  "trainable_parameter_count": null,
+  "peft_enabled": true,
+  "peft_rank": 16,
+  "peft_alpha": 32
+}

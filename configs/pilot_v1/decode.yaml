@@ -1,0 +1,5 @@
+{
+  "max_decode_tokens": 128,
+  "retry_count": 0,
+  "default_track": "track_r"
+}

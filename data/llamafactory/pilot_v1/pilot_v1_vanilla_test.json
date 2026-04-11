@@ -1,0 +1,15 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "Book me a train from Beijing to Hangzhou."
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"arrival_city\":\"Hangzhou\",\"departure_city\":\"Beijing\"},\"name\":\"train_book\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for train_book.\", \"name\": \"train_book\", \"parameters\": {\"properties\": {\"arrival_city\": {\"description\": \"Argument `arrival_city`.\", \"type\": \"string\"}, \"departure_city\": {\"description\": \"Argument `departure_city`.\", \"type\": \"string\"}}, \"required\": [\"arrival_city\", \"departure_city\"], \"type\": \"object\"}}]"
+  }
+]

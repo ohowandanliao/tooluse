@@ -1,0 +1,10 @@
+{
+  "input_path": "data/raw/pilot_v1_seed.jsonl",
+  "candidate_output_path": "data/interim/pilot_v1/candidates.jsonl",
+  "processed_dir": "data/processed/pilot_v1",
+  "source_benchmark": "toy_seed",
+  "split_seed": 11,
+  "train_ratio": 0.6,
+  "dev_ratio": 0.2,
+  "test_ratio": 0.2
+}

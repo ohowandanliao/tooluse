@@ -1,0 +1,12 @@
+{
+  "model_config_path": "configs/common/model.yaml",
+  "decode_config_path": "configs/pilot_v1/decode.yaml",
+  "dataset_path": "data/processed/pilot_v1/train.jsonl",
+  "run_root": "runs/pilot_v1",
+  "seed": 0,
+  "method_name": "hammer_like",
+  "mode": "hammer_like",
+  "optimizer_steps_budget": 1000,
+  "name_mask_probability": 0.3,
+  "irrelevant_tool_count": 2
+}

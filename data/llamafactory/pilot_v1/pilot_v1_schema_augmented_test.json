@@ -1,0 +1,28 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "Book me a train from Beijing to Hangzhou."
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"arrival_city\":\"Hangzhou\",\"departure_city\":\"Beijing\"},\"name\":\"train_book\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for train_book.\", \"name\": \"train_book\", \"parameters\": {\"properties\": {\"arrival_city\": {\"description\": \"Argument `arrival_city`.\", \"type\": \"string\"}, \"departure_city\": {\"description\": \"Argument `departure_city`.\", \"type\": \"string\"}}, \"required\": [\"arrival_city\", \"departure_city\"], \"type\": \"object\"}}]"
+  },
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "Book me a train from Beijing to Hangzhou."
+      },
+      {
+        "from": "function_call",
+        "value": "{\"arguments\":{\"test_arg_0000\":\"Beijing\",\"test_arg_0001\":\"Hangzhou\"},\"name\":\"test_tool_0000\"}"
+      }
+    ],
+    "tools": "[{\"description\": \"Tool schema for test_tool_0000.\", \"name\": \"test_tool_0000\", \"parameters\": {\"properties\": {\"test_arg_0000\": {\"description\": \"Argument `test_arg_0000`.\", \"type\": \"string\"}, \"test_arg_0001\": {\"description\": \"Argument `test_arg_0001`.\", \"type\": \"string\"}}, \"required\": [\"test_arg_0001\", \"test_arg_0000\"], \"type\": \"object\"}}]"
+  }
+]

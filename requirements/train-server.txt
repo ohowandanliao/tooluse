@@ -1,0 +1,9 @@
+# Server-side training environment for real pilot runs.
+# Install a CUDA-matched PyTorch build first, then install this file.
+transformers>=4.46,<5.0
+peft>=0.13,<0.14
+accelerate>=0.34,<0.35
+sentencepiece>=0.2,<0.3
+pyyaml>=6.0
+tqdm>=4.66
+safetensors>=0.4
