@@ -1,173 +1,274 @@
 # HANDOFF
 
-This file is for a new Codex or GPT session taking over the repo on another machine.
+这个文件是给下一次接手机器或会话的人看的，目标是尽快接管仓库，不重复踩坑。
 
-Repository target at the time of writing:
+写入时仓库目标仍然是：
 
-- branch: `main`
-- remote: `origin`
-- default push target: `origin/main`
+- branch：`main`
+- remote：`origin`
+- 默认推送目标：`origin/main`
 
-## Read order
+## 阅读顺序
 
-Read these files in this order:
+按这个顺序读：
 
-1. `STATUS.md`
-2. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
-3. `docs/status/deepresearch-status.md`
-4. `docs/superpowers/plans/2026-04-08-schema-reuse-pilot-v1-implementation-plan.md`
-5. `docs/superpowers/plans/2026-04-10-llamafactory-baseline-export-plan.md`
-6. `docs/llamafactory-baseline.md`
+1. `README.md`
+2. `docs/PROJECT_RULES.md`
+3. `STATUS.md`
+4. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+5. `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
+6. `docs/records/deepresearch-status.md`
+7. `docs/superpowers/plans/2026-04-08-schema-reuse-pilot-v1-implementation-plan.md`
+8. `docs/superpowers/plans/2026-04-10-llamafactory-baseline-export-plan.md`
+9. `docs/llamafactory-baseline.md`
 
-## What the project is actually trying to prove
+## 这个项目真正要证明什么
 
-The current paper is not about:
+当前论文**不是**在做：
 
-- general agent frameworks
-- RL as a headline method
-- feedback posterior distillation as the main contribution
+- 通用 agent framework
+- 把 `RL` 当标题方法
+- 把 feedback posterior distillation 当主贡献
 
-It is about:
+当前论文**是在做**：
 
 - `schema-reusable decision representation`
-- proving reuse through `A->B` counterfactual decoding
-- showing `A->B > shuffle/null`
-- checking whether the gain survives held-out schema transforms
+- 用 `A->B` counterfactual decoding 证明复用
+- 证明 `A->B > shuffle/null`
+- 检查收益能否在 held-out schema transform 下保留
 
-## Source-of-truth implementation paths
+执行过程中必须同时遵守：
 
-The active runtime path for baselines is:
+- `docs/PROJECT_RULES.md`
 
-- export processed paired-schema rows into LLaMA-Factory datasets
-- run baseline SFT with `llamafactory-cli`
+命名约定：
 
-Main files for that path:
+- 根目录 `STATUS.md` 是总状态总览。
+- `docs/records/` 是阶段性记录，不再使用容易混淆的 `docs/status/`。
+- 历史计划文档可能提到已删除的手写 trainer 文件，以当前代码和 `STATUS.md` 为准。
 
+## baseline 的实际 runtime 路径
+
+现在正确的 baseline 路径是：
+
+- 先把处理后的 paired-schema 样本导出成 `LLaMA-Factory` 数据集
+- 再用 `llamafactory-cli` 跑 baseline SFT / QLoRA
+
+关键文件：
+
+- `README.md`
+- `docs/PROJECT_RULES.md`
 - `src/schema_reuse/export/llamafactory.py`
 - `scripts/export_llamafactory_baselines.py`
+- `scripts/eval_llamafactory_predictions.py`
 - `configs/llamafactory/qwen_vanilla_sft_lora.yaml`
 - `configs/llamafactory/qwen_schema_augmented_sft_lora.yaml`
 - `configs/llamafactory/qwen_hammer_like_lora.yaml`
+- `configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml`
+- `configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml`
+- `configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml`
 - `docs/llamafactory-baseline.md`
 - `tests/export/test_llamafactory.py`
+- `tests/eval/test_toolcall.py`
 
-Current processed toy data:
+文档层面的固定入口现在已经明确：
 
+- 对外入口看 `README.md`
+- 项目原则和文档放置规则看 `docs/PROJECT_RULES.md`
+- 文档地图看 `docs/README.md`
+
+## 当前本地环境
+
+这台机器上已经有验证通过的环境：
+
+- env 路径：`/root/miniconda3/envs/tooluse-llf`
+- 本机产物根目录：`/root/autodl-fs/tooluse-artifacts`
+- editable `LLaMA-Factory` checkout：`/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
+- 2026-04-12 可用的下载回退：`USE_MODELSCOPE_HUB=1`
+- bring-up 时使用的本地 backbone cache：
+  - `/root/.cache/modelscope/hub/models/Qwen/Qwen2___5-0___5B-Instruct`
+
+这个环境的已验证版本：
+
+- Python `3.11.15`
+- PyTorch `2.6.0+cu124`
+- Transformers `5.2.0`
+- Datasets `4.0.0`
+- Accelerate `1.11.0`
+- PEFT `0.18.1`
+- TRL `0.24.0`
+- Bitsandbytes `0.49.2`
+- LLaMA-Factory `0.9.5.dev0`
+
+补充说明：
+
+- editable `LLaMA-Factory` checkout 和 run 目录迁到仓库外后，已经重新跑过一次 `local_qwen25_05b_vanilla_overfit_trainbook_qlora`
+- 结果仍然是训练成功、预测成功、exact tool-call `1/1`
+
+## 当前 toy 数据
+
+- `data/interim/pilot_v1/candidates.jsonl`
 - `data/processed/pilot_v1/train.jsonl`
 - `data/processed/pilot_v1/dev.jsonl`
 - `data/processed/pilot_v1/test.jsonl`
-
-Current exported toy baseline data:
-
 - `data/llamafactory/pilot_v1/`
 
-## Legacy path that should not be treated as the runtime
+## 2026-04-12 实际跑过什么
 
-These files are legacy smoke/reference only:
+成功的本地 baseline run：
 
-- `scripts/train_direct.py`
-- `scripts/train_latent.py`
-- `scripts/train_reuse.py`
-- `src/schema_reuse/train/direct.py`
-- `src/schema_reuse/train/latent.py`
-- `src/schema_reuse/train/reuse.py`
+- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora`
+- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora`
+- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora`
 
-Interpret them as:
+sanity overfit run：
 
-- old scaffolding
-- useful for understanding naming and metrics conventions
-- not the correct baseline training path anymore
+- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora`
 
-Do not build new baseline work on top of them.
+这些结果要这样理解：
 
-## Verified local commands
+- 三个 held-out toy baseline 的 exact tool-call 都是 `0`
+- tool names 和 argument keys 是对的
+- values 是错的
+- 最常见错误是 `departure/arrival` 反转
+- alias schema 样本里还出现了中文值翻译
+- overfit sanity run 是 `1/1`
 
-Run from repo root.
+结论：
 
-### Tests
+- 训练、导出、template、预测链路是通的
+- toy split 太小也太薄，不能支持科学结论
+- 不要把 BLEU/ROUGE 当 function-calling correctness
 
-```bash
-python3 -m pytest -q
-```
+## 精确评测现在怎么做
 
-Expected at the time of writing:
+仓库里已经有 exact tool-call evaluator，不需要再人工盯预测文本。
 
-- `18 passed`
+核心文件：
 
-### Baseline export
+- `scripts/eval_llamafactory_predictions.py`
+- `src/schema_reuse/eval/toolcall.py`
 
-```bash
-python3 scripts/export_llamafactory_baselines.py
-```
-
-Expected at the time of writing:
-
-- exports files into `data/llamafactory/pilot_v1`
-- reports empty datasets for:
-  - `pilot_v1_vanilla_eval`
-  - `pilot_v1_schema_augmented_eval`
-  - `pilot_v1_hammer_like_eval`
-
-This is expected because `pilot_v1/dev.jsonl` is empty.
-
-### Training environment probe
+示例：
 
 ```bash
-python3 scripts/check_train_env.py
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py \
+  --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl \
+  --processed-jsonl data/processed/pilot_v1/test.jsonl \
+  --mode vanilla
 ```
 
-Expected on the current local machine:
+输出会给出：
 
-- `ready_for_real_training = false`
-- reason: `torch 2.0.0` is too old for the intended server stack
+- parsed prediction rate
+- exact tool-call match
+- tool-name match
+- argument-key exact match
+- argument-value exact match
+- 如果提供 processed metadata，还会给 schema variant 和 transform family 分组结果
+- 默认报告文件名是和 `generated_predictions.jsonl` 同目录的 `toolcall_eval.json`
 
-## What should happen next
+## 手写 trainer 路径已经移除
 
-The next owner should do this, in order:
+旧的手写 baseline trainer 已经从代码库删除。
 
-1. Keep the scientific scope narrow.
-   - no RL mainline
-   - no feedback-mainline resurrection
-   - no framework paper drift
-2. Replace the toy `pilot_v1` evidence path with a BFCL-derived clean slice.
-3. Export that real slice into LLaMA-Factory format.
-4. Run real baseline training on a proper server.
-5. Evaluate the baseline results before deciding anything large about `reuse_main`.
-6. Only then revisit deletion of the legacy handwritten trainer files.
+原因：
 
-## What not to do
+- 它们只是 smoke stub，不是真实训练实现
+- `LLaMA-Factory` 已经是经过本机验证的 baseline runtime
+- 对外 release 时继续保留这条路径只会误导使用者
 
-Do not:
+后续不要做的事：
 
-- claim paper evidence from `pilot_v1`
-- extend the handwritten baseline trainers
-- delete the legacy trainer files before the delete gate in `STATUS.md`
-- add RL just because a later phase might use it
-- broaden the paper back into a tool-use framework story
+- 不要把这条手写 baseline 路径加回来
+- 不要把 `reuse_main` 的方法侧探索误包装成 baseline runtime
 
-## If you need a server
+## 已验证命令
 
-Current environment guidance:
+默认在仓库根目录执行。
 
-- see `docs/status/pilot-v1-resource-estimate.md`
-- see `requirements/train-server.txt`
+### 数据流水线
 
-The practical target remains:
+```bash
+python3 scripts/build_pilot_slice.py --config configs/pilot_v1/data.yaml
+python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
+```
 
-- `1x A100 80GB` or `1x H100 80GB`, preferred
-- a strong `48GB` GPU is workable but slower and tighter
+### 测试
 
-## If you need to continue cleanup
+```bash
+/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q
+```
 
-Safe cleanup now:
+2026-04-12 删除手写 trainer 后的预期结果：
 
-- improve docs
-- archive obsolete PDFs if already summarized
-- tighten the BFCL clean-slice pipeline
-- add real-data exporter coverage
+- `17 passed`
 
-Cleanup to defer:
+### baseline 导出
 
-- deleting `src/schema_reuse/train/*.py`
-- deleting `scripts/train_*.py`
-- deleting train-config tests that still document legacy assumptions
+```bash
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py
+```
+
+2026-04-12 的预期结果：
+
+- 正常导出到 `data/llamafactory/pilot_v1`
+- `pilot_v1/dev.jsonl` 为空，所以 `*_eval.json` 为空是正常的
+
+### 训练环境探针
+
+```bash
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/check_train_env.py
+```
+
+2026-04-12 的预期结果：
+
+- `ready_for_real_training = true`
+
+### 本地 GPU bring-up
+
+```bash
+USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+  configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
+
+USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+  configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml
+
+USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+  configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml
+```
+
+## 下一位接手的人应该做什么
+
+按顺序做：
+
+1. 保持论文范围收窄，不要漂移回 framework 叙事。
+2. 用真正的 BFCL clean slice 替换 `pilot_v1` 的证据路径。
+3. 把真实 slice 导出成 `LLaMA-Factory` 数据集。
+4. 对所有 `generated_predictions.jsonl` 统一跑 exact evaluator。
+5. 在真实 slice 上重跑三类 baseline。
+6. 只有这一步稳定后，才重新讨论 `reuse_main` 的训练实现。
+
+## 明确不要做什么
+
+不要：
+
+- 把 `pilot_v1` 结果说成论文证据
+- 用 BLEU/ROUGE 代替函数调用正确率
+- 重新引入手写 baseline trainer
+- 因为后期可能会用就提前把 `RL` 拉回主线
+- 把论文叙事重新扩回 tool-use framework
+
+## 如果需要服务器
+
+参考：
+
+- `docs/records/pilot-v1-resource-estimate.md`
+- `requirements/train-server.txt`
+
+当前建议仍然是：
+
+- 优选：`1x A100 80GB` 或 `1x H100 80GB`
+- 也能做但更紧：强一点的 `48GB` GPU
+
+这台本地 `2080 Ti 22GB` 机器适合工程打通和很小的 QLoRA 实验，不适合真实论文矩阵。

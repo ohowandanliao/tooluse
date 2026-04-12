@@ -1,12 +1,16 @@
-from schema_reuse.train.direct import DirectTrainer, load_train_config
-from schema_reuse.train.latent import LatentTrainer, load_latent_config
-from schema_reuse.train.reuse import ReuseTrainer, load_reuse_config
+from schema_reuse.train.backend import BackendReport, probe_training_backend
+from schema_reuse.train.formatting import (
+    build_direct_example,
+    build_reuse_example,
+    serialize_call,
+    serialize_schema,
+)
 
 __all__ = [
-    "DirectTrainer",
-    "LatentTrainer",
-    "ReuseTrainer",
-    "load_train_config",
-    "load_latent_config",
-    "load_reuse_config",
+    "BackendReport",
+    "probe_training_backend",
+    "build_direct_example",
+    "build_reuse_example",
+    "serialize_call",
+    "serialize_schema",
 ]

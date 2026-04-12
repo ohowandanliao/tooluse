@@ -1,12 +1,28 @@
-# LLaMA-Factory Baseline Export
+# LLaMA-Factory Baselines
 
-This repo does not train the baseline models with a custom trainer anymore.
-Instead, baseline SFT runs should use `llamafactory-cli` on exported datasets.
+The old handwritten baseline trainer path has been removed from this repo.
+Baseline SFT and QLoRA runs should go through `llamafactory-cli` on exported
+datasets.
+
+## Workspace Hygiene
+
+Treat the repo as releaseable source code.
+
+- Keep the Python environment outside the repo.
+- Keep editable third-party checkouts outside the repo.
+- Keep training outputs outside the repo whenever possible.
+
+Current validated local paths on this machine:
+
+- env: `/root/miniconda3/envs/tooluse-llf`
+- artifact root: `/root/autodl-fs/tooluse-artifacts`
+- editable `LLaMA-Factory` checkout:
+  `/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
 
 ## Export Baseline Datasets
 
 ```bash
-python3 scripts/export_llamafactory_baselines.py \
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/pilot_v1 \
   --output-dir data/llamafactory/pilot_v1
 ```
@@ -19,27 +35,90 @@ This writes:
 - `pilot_v1_hammer_like_{train,eval,test}.json`
 
 The exporter also reports `dataset_record_counts` and `empty_datasets`.
-For the current toy `pilot_v1`, the `dev` split is empty, so the exported `*_eval.json` files are empty by design.
+For the current toy `pilot_v1`, the `dev` split is empty, so the exported
+`*_eval.json` files are empty by design.
 
 ## Run A Baseline
 
-Replace `REPLACE_WITH_MODEL_NAME_OR_PATH` in the yaml with the actual backbone.
-The checked-in yaml files are smoke configs for `pilot_v1`, so they intentionally use `*_test` as `eval_dataset`.
-When switching to a real BFCL-derived slice, change them back to the proper `*_eval` datasets.
+Replace `REPLACE_WITH_MODEL_NAME_OR_PATH` in the generic yaml files with the
+actual backbone.
+
+The checked-in `pilot_v1` yaml files intentionally use `*_test` as
+`eval_dataset` because `pilot_v1/dev.jsonl` is empty. When switching to a real
+BFCL-derived slice, move them back to the proper `*_eval` datasets.
 
 Examples:
 
 ```bash
-llamafactory-cli train configs/llamafactory/qwen_vanilla_sft_lora.yaml
-llamafactory-cli train configs/llamafactory/qwen_schema_augmented_sft_lora.yaml
-llamafactory-cli train configs/llamafactory/qwen_hammer_like_lora.yaml
+/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_vanilla_sft_lora.yaml
+/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_schema_augmented_sft_lora.yaml
+/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_hammer_like_lora.yaml
 ```
 
 ## Current Scope
 
-- `vanilla_sft`: schema `T_A` only
-- `schema_augmented_sft`: both `T_A` and `T_B`
-- `hammer_like`: `schema_augmented_sft` plus irrelevant-tool injection in the tool list
+- `vanilla_sft`: train on schema `T_A` only.
+- `schema_augmented_sft`: train on both `T_A` and `T_B`.
+- `hammer_like`: `schema_augmented_sft` plus irrelevant-tool injection in the
+  tool list.
 
-The current `hammer_like` export is a data-level approximation.
-It does not yet implement training-time name masking inside LLaMA-Factory.
+The current `hammer_like` path is still a data-level approximation. It does not
+yet implement training-time name masking inside `LLaMA-Factory`.
+
+## Local 2080 Ti Bring-Up
+
+On 2026-04-12, the repo was also verified on a local `RTX 2080 Ti 22GB` machine
+with:
+
+- hub workaround: `USE_MODELSCOPE_HUB=1`
+- backbone: `Qwen/Qwen2.5-0.5B-Instruct`
+- runtime: `4-bit QLoRA + fp16`
+
+Machine-specific configs added for that path:
+
+- `configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml`
+- `configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml`
+- `configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml`
+- `configs/llamafactory/local_qwen25_05b_vanilla_overfit_trainbook_qlora.yaml`
+
+These machine-specific configs now write to:
+
+- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/...`
+
+Example:
+
+```bash
+USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+  configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
+```
+
+## Evaluate Exact Tool-Call Correctness
+
+Do not rely on BLEU or ROUGE for function-calling evaluation.
+
+Use the repo-side evaluator:
+
+```bash
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py \
+  --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl \
+  --processed-jsonl data/processed/pilot_v1/test.jsonl \
+  --mode vanilla
+```
+
+The report includes:
+
+- parsed prediction rate
+- exact tool-call match
+- tool-name match
+- argument-key exact match
+- argument-value exact match
+- grouped exact-match breakdowns when processed metadata is provided
+- by default, the report is written as `toolcall_eval.json` next to
+  `generated_predictions.jsonl`
+
+## Current Caveats
+
+- `predict_with_generate` on the current `LLaMA-Factory` stack also needs
+  `jieba`, `nltk`, and `rouge-chinese`.
+- The 2026-04-12 local runs are engineering bring-up only.
+- `pilot_v1` is too small and too toy-like to support paper claims.

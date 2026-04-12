@@ -2,6 +2,10 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .venv/
+.conda/
+external/
+*.egg-info/
 runs/
+saves/
 data/interim/
 data/processed/

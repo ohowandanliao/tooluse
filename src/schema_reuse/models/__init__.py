@@ -1,5 +1,3 @@
-from schema_reuse.models.bottleneck import BottleneckConfig
-from schema_reuse.models.direct_fc import DirectFCConfig
-from schema_reuse.models.reuse_model import ReuseModelConfig
+from schema_reuse.models.hammer_like import inject_irrelevant_tools, mask_schema_name
 
-__all__ = ["BottleneckConfig", "DirectFCConfig", "ReuseModelConfig"]
+__all__ = ["inject_irrelevant_tools", "mask_schema_name"]
