@@ -17,6 +17,10 @@ def _schema_from_call(call: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _split_group_id(row: dict[str, Any]) -> str:
+    return str(row.get("split_group_id", row["semantic_task_id"]))
+
+
 def split_candidates(
     rows: list[dict[str, Any]],
     *,
@@ -30,7 +34,7 @@ def split_candidates(
 
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
-        grouped[row["semantic_task_id"]].append(row)
+        grouped[_split_group_id(row)].append(row)
 
     semantic_ids = list(grouped)
     rng = random.Random(seed)
@@ -68,7 +72,7 @@ def build_pair_row(
     transform_family: str = DEFAULT_FAMILY,
 ) -> dict[str, Any]:
     y_a = row["ground_truth"]
-    t_a = _schema_from_call(y_a)
+    t_a = row.get("tool_spec", _schema_from_call(y_a))
     transform = build_transform(
         t_a,
         seed=transform_seed,
@@ -80,6 +84,7 @@ def build_pair_row(
 
     return {
         "semantic_task_id": row["semantic_task_id"],
+        "split_group_id": row.get("split_group_id", row["semantic_task_id"]),
         "user": row["user"],
         "T_A": t_a,
         "T_B": t_b,

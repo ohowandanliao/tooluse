@@ -9,10 +9,12 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 
 ## Documentation Entry Points
 
+- `RULES.md`: user-editable project rules and working principles
 - `docs/PROJECT_RULES.md`: project principles, documentation rules, and artifact
   policy
 - `STATUS.md`: current implementation/runtime status
 - `HANDOFF.md`: cross-machine and cross-session handoff
+- `docs/environment-repro.md`: how to rebuild the validated environment on a new machine
 - `docs/README.md`: document map by role
 
 ## Scope
@@ -35,6 +37,13 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 
 Use a Python 3.11 environment outside the repo. The currently validated local
 environment on this machine is `/root/miniconda3/envs/tooluse-llf`.
+
+If you are restoring on a new machine without Codex, read
+`docs/environment-repro.md` first and prefer the repo-side bootstrap script:
+
+```bash
+bash scripts/bootstrap_train_env.sh --help
+```
 
 ```bash
 /root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q
@@ -74,6 +83,7 @@ Treat this repo as releaseable open-source code, not as a scratch directory.
 
 - `STATUS.md`: current implementation/runtime status and project guardrails.
 - `HANDOFF.md`: machine-to-machine handoff for a new Codex/GPT session.
+- `RULES.md`: user-maintained rules entrypoint for this repo.
 - `docs/PROJECT_RULES.md`: project principles and documentation conventions.
 - `2026-03-31-nips2026-function-calling-idea-draft-v2.md`: current scientific
   draft.

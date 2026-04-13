@@ -1,0 +1,38 @@
+{
+  "source_benchmark": "bfcl_v4_single_turn_single_tool",
+  "candidate_output_path": "data/interim/bfcl_v4_single_turn/candidates.jsonl",
+  "audit_report_path": "data/interim/bfcl_v4_single_turn/audit.json",
+  "processed_dir": "data/processed/bfcl_v4_single_turn",
+  "split_seed": 11,
+  "train_ratio": 0.8,
+  "dev_ratio": 0.1,
+  "test_ratio": 0.1,
+  "split_group_strategy": "tool_signature",
+  "require_single_tool": true,
+  "categories": [
+    {
+      "name": "simple_python",
+      "language": "python",
+      "question_path": "$BFCL_ROOT/bfcl_eval/data/BFCL_v4_simple_python.json",
+      "answer_path": "$BFCL_ROOT/bfcl_eval/data/possible_answer/BFCL_v4_simple_python.json"
+    },
+    {
+      "name": "simple_java",
+      "language": "java",
+      "question_path": "$BFCL_ROOT/bfcl_eval/data/BFCL_v4_simple_java.json",
+      "answer_path": "$BFCL_ROOT/bfcl_eval/data/possible_answer/BFCL_v4_simple_java.json"
+    },
+    {
+      "name": "simple_javascript",
+      "language": "javascript",
+      "question_path": "$BFCL_ROOT/bfcl_eval/data/BFCL_v4_simple_javascript.json",
+      "answer_path": "$BFCL_ROOT/bfcl_eval/data/possible_answer/BFCL_v4_simple_javascript.json"
+    },
+    {
+      "name": "live_simple",
+      "language": "mixed",
+      "question_path": "$BFCL_ROOT/bfcl_eval/data/BFCL_v4_live_simple.json",
+      "answer_path": "$BFCL_ROOT/bfcl_eval/data/possible_answer/BFCL_v4_live_simple.json"
+    }
+  ]
+}

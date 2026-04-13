@@ -10,8 +10,45 @@ from schema_reuse.data.filter_bfcl import load_jsonl
 from schema_reuse.train.formatting import serialize_call
 
 
+TYPE_ALIASES = {
+    "array": "array",
+    "arraylist": "array",
+    "bool": "boolean",
+    "boolean": "boolean",
+    "dict": "object",
+    "double": "number",
+    "float": "number",
+    "hashmap": "object",
+    "int": "integer",
+    "integer": "integer",
+    "long": "integer",
+    "number": "number",
+    "object": "object",
+    "str": "string",
+    "string": "string",
+    "tuple": "array",
+    "any": "string",
+}
+
+
+def _normalize_jsonschema_types(payload: Any) -> Any:
+    if isinstance(payload, dict):
+        normalized = {}
+        for key, value in payload.items():
+            if key == "type" and isinstance(value, str):
+                normalized[key] = TYPE_ALIASES.get(value.lower(), value.lower())
+            else:
+                normalized[key] = _normalize_jsonschema_types(value)
+        return normalized
+    if isinstance(payload, list):
+        return [_normalize_jsonschema_types(item) for item in payload]
+    return payload
+
+
 def schema_to_tool(schema: dict[str, Any]) -> dict[str, Any]:
     parameters = schema.get("parameters", [])
+    if isinstance(parameters, dict) and isinstance(parameters.get("properties"), dict):
+        return _normalize_jsonschema_types(deepcopy(schema))
     properties = {
         parameter: {
             "type": "string",

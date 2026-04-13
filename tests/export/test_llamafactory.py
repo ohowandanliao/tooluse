@@ -6,6 +6,7 @@ from schema_reuse.export.llamafactory import (
     export_baseline_splits,
     export_baselines_to_directory,
     make_sharegpt_record,
+    schema_to_tool,
 )
 
 
@@ -30,6 +31,26 @@ def test_build_dataset_info_registers_sharegpt_files() -> None:
     assert info["pilot_v1_vanilla_train"]["formatting"] == "sharegpt"
     assert info["pilot_v1_vanilla_train"]["columns"]["messages"] == "conversations"
     assert info["pilot_v1_vanilla_train"]["columns"]["tools"] == "tools"
+
+
+def test_schema_to_tool_preserves_rich_schema_and_normalizes_dict_type() -> None:
+    tool = schema_to_tool(
+        {
+            "name": "math.factorial",
+            "description": "Calculate the factorial of a number.",
+            "parameters": {
+                "type": "dict",
+                "properties": {
+                    "number": {"type": "long", "description": "The target number."},
+                    "flag": {"type": "Boolean", "description": "Boolean flag."},
+                },
+                "required": ["number", "flag"],
+            },
+        }
+    )
+    assert tool["parameters"]["type"] == "object"
+    assert tool["parameters"]["properties"]["number"]["type"] == "integer"
+    assert tool["parameters"]["properties"]["flag"]["type"] == "boolean"
 
 
 def test_export_baseline_splits_creates_three_train_datasets() -> None:

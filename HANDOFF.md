@@ -13,13 +13,13 @@
 按这个顺序读：
 
 1. `README.md`
-2. `docs/PROJECT_RULES.md`
-3. `STATUS.md`
-4. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
-5. `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
-6. `docs/records/deepresearch-status.md`
-7. `docs/superpowers/plans/2026-04-08-schema-reuse-pilot-v1-implementation-plan.md`
-8. `docs/superpowers/plans/2026-04-10-llamafactory-baseline-export-plan.md`
+2. `RULES.md`
+3. `docs/PROJECT_RULES.md`
+4. `STATUS.md`
+5. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+6. `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
+7. `docs/records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`
+8. `docs/environment-repro.md`
 9. `docs/llamafactory-baseline.md`
 
 ## 这个项目真正要证明什么
@@ -39,7 +39,10 @@
 
 执行过程中必须同时遵守：
 
+- `RULES.md`
 - `docs/PROJECT_RULES.md`
+- 特别是新增的原则四：
+  - 不确定的东西先查外部做法，再决定是否推进
 
 命名约定：
 
@@ -67,6 +70,8 @@
 - `configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml`
 - `configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml`
 - `configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml`
+- `scripts/build_bfcl_v4_single_turn_slice.py`
+- `configs/bfcl_v4_single_turn/data.json`
 - `docs/llamafactory-baseline.md`
 - `tests/export/test_llamafactory.py`
 - `tests/eval/test_toolcall.py`
@@ -74,7 +79,9 @@
 文档层面的固定入口现在已经明确：
 
 - 对外入口看 `README.md`
-- 项目原则和文档放置规则看 `docs/PROJECT_RULES.md`
+- 用户原则先看 `RULES.md`
+- 项目原则和文档放置规则再看 `docs/PROJECT_RULES.md`
+- 新机器恢复路径看 `docs/environment-repro.md`
 - 文档地图看 `docs/README.md`
 
 ## 当前本地环境
@@ -104,6 +111,14 @@
 
 - editable `LLaMA-Factory` checkout 和 run 目录迁到仓库外后，已经重新跑过一次 `local_qwen25_05b_vanilla_overfit_trainbook_qlora`
 - 结果仍然是训练成功、预测成功、exact tool-call `1/1`
+- 2026-04-13 还额外 clone 了官方 `gorilla` 仓库到：
+  - `/root/autodl-fs/tooluse-artifacts/external/gorilla`
+  - 这里只用于读取官方 `BFCL` 数据和评测实现，不在仓库内提交
+- 2026-04-13 已补充新机器恢复文档和精确依赖文件：
+  - `docs/environment-repro.md`
+  - `requirements/train-server-validated.txt`
+- 2026-04-13 额外补充了裸 Linux 恢复脚本：
+  - `scripts/bootstrap_train_env.sh`
 
 ## 当前 toy 数据
 
@@ -112,6 +127,29 @@
 - `data/processed/pilot_v1/dev.jsonl`
 - `data/processed/pilot_v1/test.jsonl`
 - `data/llamafactory/pilot_v1/`
+
+## 当前 BFCL ingest 状态
+
+已在仓库内打通：
+
+- `data/interim/bfcl_v4_single_turn/candidates.jsonl`
+- `data/interim/bfcl_v4_single_turn/audit.json`
+- `data/processed/bfcl_v4_single_turn/{train,dev,test}.jsonl`
+- `data/llamafactory/bfcl_v4_single_turn/`
+
+本机当前结果：
+
+- accepted `774`
+- `train=609`
+- `dev=94`
+- `test=71`
+
+注意这里的定位：
+
+- 这是 `BFCL` benchmark ingest / clean eval slice
+- 当前**不要**默认把它视为 baseline 主训练源
+- 理由见：
+  - `docs/records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`
 
 ## 2026-04-12 实际跑过什么
 
@@ -202,7 +240,7 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 
 2026-04-12 删除手写 trainer 后的预期结果：
 
-- `17 passed`
+- `23 passed`
 
 ### baseline 导出
 
@@ -215,6 +253,28 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 - 正常导出到 `data/llamafactory/pilot_v1`
 - `pilot_v1/dev.jsonl` 为空，所以 `*_eval.json` 为空是正常的
 
+### BFCL ingest
+
+```bash
+BFCL_ROOT=/root/autodl-fs/tooluse-artifacts/external/gorilla/berkeley-function-call-leaderboard \
+  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_bfcl_v4_single_turn_slice.py \
+  --config configs/bfcl_v4_single_turn/data.json
+
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+  --config configs/bfcl_v4_single_turn/data.json
+
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+  --processed-dir data/processed/bfcl_v4_single_turn \
+  --output-dir data/llamafactory/bfcl_v4_single_turn \
+  --dataset-prefix bfcl_v4_single_turn
+```
+
+2026-04-13 的预期结果：
+
+- 写出 `data/interim/bfcl_v4_single_turn/audit.json`
+- 写出 `data/processed/bfcl_v4_single_turn/{train,dev,test}.jsonl`
+- 写出 `data/llamafactory/bfcl_v4_single_turn/*`
+
 ### 训练环境探针
 
 ```bash
@@ -224,6 +284,25 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 2026-04-12 的预期结果：
 
 - `ready_for_real_training = true`
+
+### 新机器恢复
+
+优先阅读：
+
+- `docs/environment-repro.md`
+
+核心文件：
+
+- `requirements/train-server.txt`
+- `requirements/train-server-validated.txt`
+- `scripts/bootstrap_train_env.sh`
+
+当前判断：
+
+- 可以默认保存系统盘镜像 / 快照作为快速恢复手段
+- 但不要把它当成唯一环境记录
+- repo 内必须保留可审计的依赖、commit、命令和验证步骤
+- 当前主维护的是裸 Linux 恢复路径，不单独维护 Docker 路径
 
 ### 本地 GPU bring-up
 
@@ -243,11 +322,11 @@ USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli trai
 按顺序做：
 
 1. 保持论文范围收窄，不要漂移回 framework 叙事。
-2. 用真正的 BFCL clean slice 替换 `pilot_v1` 的证据路径。
-3. 把真实 slice 导出成 `LLaMA-Factory` 数据集。
-4. 对所有 `generated_predictions.jsonl` 统一跑 exact evaluator。
-5. 在真实 slice 上重跑三类 baseline。
-6. 只有这一步稳定后，才重新讨论 `reuse_main` 的训练实现。
+2. 先读 `docs/records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`，不要默认把 `BFCL` 当 baseline 训练源。
+3. 优先检查 `Salesforce/xlam-function-calling-60k` 是否能接入当前 paired-schema 流水线。
+4. 如果 `xLAM/APIGen` 可用，先把它接成 baseline 训练源。
+5. 把 `BFCL` 保持为 benchmark / eval slice，并对所有预测输出统一跑 exact evaluator。
+6. 只有 baseline 训练源和 held-out benchmark 的分工稳定后，才重新讨论 `reuse_main` 的训练实现。
 
 ## 明确不要做什么
 
@@ -258,6 +337,7 @@ USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli trai
 - 重新引入手写 baseline trainer
 - 因为后期可能会用就提前把 `RL` 拉回主线
 - 把论文叙事重新扩回 tool-use framework
+- 在没有进一步论证前，把 `BFCL possible_answer` 直接压成单一训练 target 然后包装成默认 baseline 主线
 
 ## 如果需要服务器
 

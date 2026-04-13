@@ -30,12 +30,18 @@ def main() -> None:
         default=2,
         help="Number of irrelevant tools to inject for hammer_like exports.",
     )
+    parser.add_argument(
+        "--dataset-prefix",
+        default="pilot_v1",
+        help="Dataset prefix used for exported dataset names.",
+    )
     args = parser.parse_args()
 
     report = export_baselines_to_directory(
         args.processed_dir,
         args.output_dir,
         irrelevant_tool_count=args.irrelevant_tool_count,
+        dataset_prefix=args.dataset_prefix,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
 

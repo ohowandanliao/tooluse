@@ -69,15 +69,19 @@ def has_verifiable_ground_truth(sample: dict[str, Any]) -> bool:
     return bool(metadata.get("executable") or metadata.get("ast_verifiable"))
 
 
-def is_valid_candidate(sample: dict[str, Any]) -> bool:
+def candidate_audit(sample: dict[str, Any]) -> dict[str, Any]:
     metadata = sample.get("metadata", {})
     if not metadata.get("single_turn", False):
-        return False
+        return {"is_valid": False, "reason": "not_single_turn"}
     if not has_verifiable_ground_truth(sample):
-        return False
+        return {"is_valid": False, "reason": "not_verifiable"}
     if mentions_schema_surface_forms(sample):
-        return False
-    return True
+        return {"is_valid": False, "reason": "mentions_schema_surface_forms"}
+    return {"is_valid": True, "reason": None}
+
+
+def is_valid_candidate(sample: dict[str, Any]) -> bool:
+    return bool(candidate_audit(sample)["is_valid"])
 
 
 def build_semantic_task_id(sample: dict[str, Any]) -> str:
@@ -96,9 +100,15 @@ def build_candidate_record(
     sample: dict[str, Any],
     *,
     source_benchmark: str,
+    split_group_id: str | None = None,
 ) -> dict[str, Any]:
+    audit = candidate_audit(sample)
     record = dict(sample)
     record["semantic_task_id"] = build_semantic_task_id(sample)
-    record["audit_status"] = "accepted"
+    record["audit_status"] = "accepted" if audit["is_valid"] else "rejected"
+    if audit["reason"] is not None:
+        record["audit_reason"] = audit["reason"]
+    if split_group_id is not None:
+        record["split_group_id"] = split_group_id
     record["source_benchmark"] = source_benchmark
     return record
