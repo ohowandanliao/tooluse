@@ -255,7 +255,7 @@
 - 2026-04-14 当前已经起了一条 real-data run：
   - config：`configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
   - output：`/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
-  - 如果接手时它已经结束，下一步先跑 exact evaluator，再把轻量结果同步回 `results/`
+  - 这条 run 现在已经完成训练、预测和 exact evaluator，并已同步轻量结果到 `results/`
 
 ## 当前 xLAM baseline 运行进度
 
@@ -271,21 +271,27 @@
 - 训练已完成：
   - `train_loss=0.0520`
   - `train_runtime=3255.909s`
-- 预测还没结束：
-  - `launch.log` 已到 `2563/2570`
-  - `generated_predictions.jsonl` 还没出现
-  - `predict_results.json` 还没出现
-  - `toolcall_eval.json` 还没出现
+- 预测已完成：
+  - `predict_runtime=9178.2133s`
+- exact evaluator 已完成：
+  - `parsed_prediction_rate=0.9938`
+  - `exact_match_rate=0.8105`
+  - `exact_match_count=2083/2570`
+  - `name_match_rate=0.9938`
+  - `argument_key_exact_match_rate=0.8949`
+  - `argument_value_exact_match_rate=0.8105`
+- 轻量结果证据已同步回仓库：
+  - `results/local_2080ti/xlam_fc_single_call/manifest.json`
+  - `results/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000/`
 - 当前没有并行开第二个 xLAM baseline：
   - `schema_augmented` 未启动
   - `hammer_like` 未启动
 
 接手后优先动作：
 
-1. 先确认这个 `vanilla` prediction 是否正常结束。
-2. 结束后立刻跑 exact evaluator。
-3. 把轻量结果同步进 `results/local_2080ti/xlam_fc_single_call/`。
-4. 如果有新机器，把 `schema_augmented` / `hammer_like` 拆到别的机器；只有没有额外机器时才考虑串行排队。
+1. 基于 `vanilla exact_match_rate=0.8105` 判断 direct baseline 的真实强度。
+2. 如果有新机器，把 `schema_augmented` / `hammer_like` 拆到别的机器。
+3. 两个 direct baseline 跑完后，再判断 held-out gap 还剩多少。
 
 ## 2026-04-12 实际跑过什么
 

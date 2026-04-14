@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-04-14T08:24:33Z",
+  "machine": "local_2080ti",
+  "experiment_group": "xlam_fc_single_call",
+  "dataset": "xlam_fc_single_call",
+  "artifact_root": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call",
+  "repo_bundle_root": "results/local_2080ti/xlam_fc_single_call",
+  "include_generated_predictions": true,
+  "run_count": 1,
+  "runs": [
+    {
+      "run_name": "qwen25_05b_vanilla_qlora_pilot1000",
+      "mode": "vanilla",
+      "run_kind": "baseline",
+      "config_path": "configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml",
+      "artifact_path": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000",
+      "repo_bundle_path": "results/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 2570,
+          "parsed_prediction_count": 2554,
+          "parsed_prediction_rate": 0.9937743190661479,
+          "exact_match_count": 2083,
+          "exact_match_rate": 0.8105058365758755,
+          "name_match_rate": 0.9937743190661479,
+          "argument_key_exact_match_rate": 0.8949416342412452,
+          "argument_value_exact_match_rate": 0.8105058365758755,
+          "exact_match_by_schema_variant": {
+            "A": 0.8105058365758755
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 0.8105058365758755
+          }
+        },
+        "train": {
+          "epoch": 0.38857586943850786,
+          "train_loss": 0.05200534148514271,
+          "train_runtime": 3255.909,
+          "train_samples_per_second": 2.457,
+          "train_steps_per_second": 0.307
+        },
+        "predict": {
+          "predict_runtime": 9178.2133,
+          "predict_samples_per_second": 0.28,
+          "predict_steps_per_second": 0.28,
+          "predict_bleu-4": 96.18013128404671,
+          "predict_rouge-1": 98.52255171206227,
+          "predict_rouge-2": 98.06292961089494,
+          "predict_rouge-l": 98.27706992217898
+        }
+      },
+      "conclusion": "See the repo evidence bundle and external run directory for details."
+    }
+  ],
+  "summary": {
+    "best_exact_match_run": "qwen25_05b_vanilla_qlora_pilot1000",
+    "best_exact_match_rate": 0.8105058365758755,
+    "repo_policy": "Commit lightweight experiment evidence here, but keep weights and other heavy artifacts outside the repo."
+  }
+}

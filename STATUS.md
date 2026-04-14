@@ -183,6 +183,10 @@
   - 当前结果：输出 exact tool-call 评估报告
 - `/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1 --output-dir results/local_2080ti/pilot_v1 --machine local_2080ti --experiment-group pilot_v1 --dataset pilot_v1 --include-generated-predictions`
   - 当前结果：把轻量实验结果证据同步回仓库 `results/local_2080ti/pilot_v1`
+- `/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000/generated_predictions.jsonl --processed-jsonl data/processed/xlam_fc_single_call/test.jsonl --mode vanilla`
+  - 当前结果：`xLAM vanilla pilot1000` exact tool-call `2083/2570 = 0.8105`
+- `/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call --output-dir results/local_2080ti/xlam_fc_single_call --machine local_2080ti --experiment-group xlam_fc_single_call --dataset xlam_fc_single_call --include-generated-predictions`
+  - 当前结果：把 `xLAM vanilla pilot1000` 轻量结果证据同步回仓库 `results/local_2080ti/xlam_fc_single_call`
 
 ## 本地实验状态
 
@@ -236,12 +240,23 @@
     - `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
   - 当前状态：
     - 训练已完成
+    - 预测已完成
+    - exact evaluator 已完成
+    - 轻量结果证据已同步回仓库
+  - 当前关键指标：
     - `train_loss=0.0520`
     - `train_runtime=3255.909s`
-    - 预测仍在进行中，尚未落出最终 `generated_predictions.jsonl` / `predict_results.json`
-  - 2026-04-14 本轮最后一次观察：
-    - `launch.log` 已到 `2563/2570`
-    - 当前只启动了 `vanilla`
+    - `predict_runtime=9178.2133s`
+    - `parsed_prediction_rate=0.9938`
+    - `exact_match_rate=0.8105`
+    - `exact_match_count=2083/2570`
+    - `name_match_rate=0.9938`
+    - `argument_key_exact_match_rate=0.8949`
+    - `argument_value_exact_match_rate=0.8105`
+  - 仓库内证据：
+    - `results/local_2080ti/xlam_fc_single_call/manifest.json`
+    - `results/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000/`
+  - 当前只完成了 `vanilla`
     - `schema_augmented` 和 `hammer_like` 还未开始
 
 2026-04-14 新增的外部 challenge 整合判断：
