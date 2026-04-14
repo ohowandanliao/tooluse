@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-04-13T09:43:16Z",
+  "machine": "local_2080ti",
+  "experiment_group": "pilot_v1",
+  "dataset": "pilot_v1",
+  "artifact_root": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1",
+  "repo_bundle_root": "results/local_2080ti/pilot_v1",
+  "include_generated_predictions": true,
+  "run_count": 4,
+  "runs": [
+    {
+      "run_name": "qwen25_05b_hammer_like_qlora",
+      "mode": "hammer_like",
+      "run_kind": "baseline",
+      "config_path": "configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml",
+      "artifact_path": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora",
+      "repo_bundle_path": "results/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 2,
+          "parsed_prediction_count": 2,
+          "parsed_prediction_rate": 1.0,
+          "exact_match_count": 0,
+          "exact_match_rate": 0.0,
+          "name_match_rate": 1.0,
+          "argument_key_exact_match_rate": 1.0,
+          "argument_value_exact_match_rate": 0.0,
+          "exact_match_by_schema_variant": {
+            "A": 0.0,
+            "B": 0.0
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 0.0
+          }
+        },
+        "train": {
+          "epoch": 30.0,
+          "train_loss": 0.004456632679405933,
+          "train_runtime": 30.3028,
+          "train_samples_per_second": 1.98,
+          "train_steps_per_second": 1.98
+        },
+        "predict": {
+          "predict_runtime": 7.431,
+          "predict_samples_per_second": 0.269,
+          "predict_steps_per_second": 0.269,
+          "predict_bleu-4": 90.99145,
+          "predict_rouge-1": 94.73685,
+          "predict_rouge-2": 93.9394,
+          "predict_rouge-l": 96.06479999999999
+        }
+      },
+      "conclusion": "Tool name and argument keys are correct, but argument values fail exact match."
+    },
+    {
+      "run_name": "qwen25_05b_schema_augmented_qlora",
+      "mode": "schema_augmented",
+      "run_kind": "baseline",
+      "config_path": "configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml",
+      "artifact_path": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora",
+      "repo_bundle_path": "results/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 2,
+          "parsed_prediction_count": 2,
+          "parsed_prediction_rate": 1.0,
+          "exact_match_count": 0,
+          "exact_match_rate": 0.0,
+          "name_match_rate": 1.0,
+          "argument_key_exact_match_rate": 1.0,
+          "argument_value_exact_match_rate": 0.0,
+          "exact_match_by_schema_variant": {
+            "A": 0.0,
+            "B": 0.0
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 0.0
+          }
+        },
+        "train": {
+          "epoch": 30.0,
+          "train_loss": 0.009449722981177426,
+          "train_runtime": 28.2416,
+          "train_samples_per_second": 2.125,
+          "train_steps_per_second": 2.125
+        },
+        "predict": {
+          "predict_runtime": 7.7976,
+          "predict_samples_per_second": 0.256,
+          "predict_steps_per_second": 0.256,
+          "predict_bleu-4": 90.99145,
+          "predict_rouge-1": 94.73685,
+          "predict_rouge-2": 93.9394,
+          "predict_rouge-l": 96.06479999999999
+        }
+      },
+      "conclusion": "Tool name and argument keys are correct, but argument values fail exact match."
+    },
+    {
+      "run_name": "qwen25_05b_vanilla_overfit_trainbook_qlora",
+      "mode": "vanilla",
+      "run_kind": "sanity_overfit",
+      "config_path": "configs/llamafactory/local_qwen25_05b_vanilla_overfit_trainbook_qlora.yaml",
+      "artifact_path": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora",
+      "repo_bundle_path": "results/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 1,
+          "parsed_prediction_count": 1,
+          "parsed_prediction_rate": 1.0,
+          "exact_match_count": 1,
+          "exact_match_rate": 1.0,
+          "name_match_rate": 1.0,
+          "argument_key_exact_match_rate": 1.0,
+          "argument_value_exact_match_rate": 1.0,
+          "exact_match_by_schema_variant": {
+            "A": 1.0
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 1.0
+          }
+        },
+        "train": {
+          "epoch": 40.0,
+          "train_loss": 0.019234412994410376,
+          "train_runtime": 19.7204,
+          "train_samples_per_second": 2.028,
+          "train_steps_per_second": 2.028
+        },
+        "predict": {
+          "predict_runtime": 3.8353,
+          "predict_samples_per_second": 0.261,
+          "predict_steps_per_second": 0.261,
+          "predict_bleu-4": 99.1632,
+          "predict_rouge-1": 100.0,
+          "predict_rouge-2": 100.0,
+          "predict_rouge-l": 100.0
+        }
+      },
+      "conclusion": "Overfit sanity pass; the train-export-predict-eval stack is connected."
+    },
+    {
+      "run_name": "qwen25_05b_vanilla_qlora",
+      "mode": "vanilla",
+      "run_kind": "baseline",
+      "config_path": "configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml",
+      "artifact_path": "/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora",
+      "repo_bundle_path": "results/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 1,
+          "parsed_prediction_count": 1,
+          "parsed_prediction_rate": 1.0,
+          "exact_match_count": 0,
+          "exact_match_rate": 0.0,
+          "name_match_rate": 1.0,
+          "argument_key_exact_match_rate": 1.0,
+          "argument_value_exact_match_rate": 0.0,
+          "exact_match_by_schema_variant": {
+            "A": 0.0
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 0.0
+          }
+        },
+        "train": {
+          "epoch": 30.0,
+          "train_loss": 0.001416889084794093,
+          "train_runtime": 25.3433,
+          "train_samples_per_second": 1.184,
+          "train_steps_per_second": 1.184
+        },
+        "predict": {
+          "predict_runtime": 8.6936,
+          "predict_samples_per_second": 0.115,
+          "predict_steps_per_second": 0.115,
+          "predict_bleu-4": 97.8743,
+          "predict_rouge-1": 100.0,
+          "predict_rouge-2": 100.0,
+          "predict_rouge-l": 95.8333
+        }
+      },
+      "conclusion": "Tool name and argument keys are correct, but argument values fail exact match."
+    }
+  ],
+  "summary": {
+    "best_exact_match_run": "qwen25_05b_vanilla_overfit_trainbook_qlora",
+    "best_exact_match_rate": 1.0,
+    "repo_policy": "Commit lightweight experiment evidence here, but keep weights and other heavy artifacts outside the repo."
+  }
+}

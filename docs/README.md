@@ -14,7 +14,9 @@
    - 当前真实状态、已验证路径、下一步建议
 5. `../HANDOFF.md`
    - 新会话最短接手路径
-6. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+6. `../results/README.md`
+   - 仓库内实验结果证据入口
+7. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
    - 当前论文主草稿
 
 ## 文档分层
@@ -36,12 +38,22 @@
 
 - `llamafactory-baseline.md`
   - baseline runtime 与 exact evaluator 使用说明
+- `new-machine-quickstart.md`
+  - 新机器最短安装与开跑路径
 - `environment-repro.md`
   - 新机器环境恢复、裸 Linux 安装脚本、镜像/快照策略
+- `../results/README.md`
+  - 仓库内实验结果证据入口
+- `../results/local_2080ti/pilot_v1/README.md`
+  - 当前已提交的本机 run 结果摘要
 - `records/2026-04-12-local-2080ti-qlora-bringup.md`
   - 本机 `2080 Ti` 上的 `LLaMA-Factory` 打通记录
 - `records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`
   - BFCL 的外部用法审计，以及可替代的 baseline 数据源判断
+- `records/2026-04-14-xlam-fc60k-ingest-audit.md`
+  - `xLAM function-calling-60k` 的字段、license、真实全量 ingest 结果与当前边界
+- `records/2026-04-14-external-paper-eval-synthesis.md`
+  - 外部 `GPT-5.4-pro` 论文评估结果的仓库内整合版，以及当前采纳的 kill/go 判据
 - `records/pilot-v1-resource-estimate.md`
   - 算力和服务器需求估计
 
@@ -52,3 +64,4 @@
 - 影响当前决策的文档保留在根目录或活跃 `docs/` 目录。
 - 只对内部协作、AI 会话或历史草稿有意义的文档，不默认保留到 release 仓库。
 - 环境、checkpoint、editable 第三方源码和其它重型产物不要放进仓库根目录。
+- 轻量实验结果证据统一放在 `../results/`。

@@ -1,6 +1,6 @@
 # STATUS
 
-最后更新：2026-04-13
+最后更新：2026-04-14
 
 ## 论文主线
 
@@ -38,10 +38,27 @@
 - `LLaMA-Factory` 预测输出的 exact tool-call 评估脚本：
   - `scripts/eval_llamafactory_predictions.py`
   - `src/schema_reuse/eval/toolcall.py`
+- `counterfactual` 指标聚合工具还只到占位阶段：
+  - `scripts/eval_counterfactual.py`
+  - `src/schema_reuse/eval/counterfactual.py`
 - 官方 `BFCL v4` 单轮单工具 ingest / audit / export 路径：
   - `scripts/build_bfcl_v4_single_turn_slice.py`
   - `configs/bfcl_v4_single_turn/data.json`
   - `src/schema_reuse/data/bfcl_official.py`
+- `xLAM function-calling-60k` 的本地 ingest / audit / export 路径已经在真实全量数据上跑通：
+  - `scripts/build_xlam_fc_single_call_slice.py`
+  - `configs/xlam_fc_single_call/data.json`
+  - `src/schema_reuse/data/xlam_official.py`
+- `xLAM` single-answer clean slice 的本机构建结果：
+  - raw `60000`
+  - accepted `25711`
+  - rejected `34289`
+  - rejection reasons：
+    - `not_single_answer=31539`
+    - `mentions_schema_surface_forms=2750`
+  - `train=20588`
+  - `dev=2553`
+  - `test=2570`
 - `BFCL` clean slice 的本机构建结果：
   - accepted `774`
   - `train=609`
@@ -57,8 +74,17 @@
   - `README.md`
   - `RULES.md`
   - `docs/PROJECT_RULES.md`
+  - `results/README.md`
   - `docs/environment-repro.md`
   - `docs/README.md`
+- 已补充仓库内实验结果证据目录：
+  - `results/local_2080ti/pilot_v1/README.md`
+  - `results/local_2080ti/pilot_v1/commands.md`
+  - `results/local_2080ti/pilot_v1/manifest.json`
+- 已新增论文推进判断记录：
+  - `docs/records/2026-04-14-paper-progress-and-next-steps.md`
+- 已新增 `xLAM` 接入审计记录：
+  - `docs/records/2026-04-14-xlam-fc60k-ingest-audit.md`
 - 已验证可用的训练环境：`/root/miniconda3/envs/tooluse-llf`
 - 已外置的本机产物根目录：`/root/autodl-fs/tooluse-artifacts`
   - editable `LLaMA-Factory` checkout：`/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
@@ -67,6 +93,14 @@
   - `configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml`
   - `configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml`
   - `configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml`
+- 面向 `xLAM` real-data pilot 的单卡 QLoRA 配置：
+  - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
+  - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_schema_augmented_qlora_pilot1000.yaml`
+  - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_hammer_like_qlora_pilot1000.yaml`
+- 已新增新机器最短启动文档：
+  - `docs/new-machine-quickstart.md`
+  - 已补充 `vanilla / schema_augmented / hammer_like` 三条训练与评测命令
+  - 默认建议改为“每台机器只跑一个 baseline 配方”，用于分担多机实验压力
 - 一个 overfit sanity 配置：
   - `configs/llamafactory/local_qwen25_05b_vanilla_overfit_trainbook_qlora.yaml`
 - 产物目录外置后，已经重新实际跑通一次 overfit smoke 训练，说明迁移没有把训练栈弄断
@@ -82,6 +116,7 @@
 - TRL `0.24.0`
 - Bitsandbytes `0.49.2`
 - LLaMA-Factory `0.9.5.dev0`
+- `pypdf 6.10.0` 已临时装入当前环境，用于读取本机外部 PDF 调研材料；它不是当前 repo 训练链路的必需依赖
 - 本机下载回退方案：`USE_MODELSCOPE_HUB=1`
 - 当前已记录的新机恢复文档：
   - `docs/environment-repro.md`
@@ -99,6 +134,12 @@
 
 - 新增了原则四：
   - 不确定的东西先查外部做法，再决定是否推进
+- 新增了原则五：
+  - 仓库内要保留可复现实验证据，但不提交权重
+- 新增了原则六：
+  - 如果需要，可以整理 prompt 让用户去问 `GPT-5.4-pro` 做扩展或纠偏
+- 新增了原则七：
+  - 做外部检索时，尽量优先更新的资料；旧资料要么够新，要么够硬
 - 已审计外部论文/工程如何使用 `BFCL`：
   - 结论是 `BFCL` 当前更应被视为 benchmark / eval 数据，而不是默认 baseline 训练源
 - 相关记录：
@@ -113,9 +154,15 @@
 - `python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml`
   - 当前结果：写出 `data/processed/pilot_v1/{train,dev,test}.jsonl`
 - `/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q`
-  - 当前结果：`23 passed`
+  - 当前结果：`29 passed`
 - `/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py`
   - 当前结果：成功导出 `data/llamafactory/pilot_v1/*`
+- `XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py --config configs/xlam_fc_single_call/data.json`
+  - 当前结果：写出 `data/interim/xlam_fc_single_call/{candidates.jsonl,audit.json}`
+- `/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py --config configs/xlam_fc_single_call/data.json`
+  - 当前结果：写出 `data/processed/xlam_fc_single_call/{train,dev,test}.jsonl`
+- `/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py --processed-dir data/processed/xlam_fc_single_call --output-dir data/llamafactory/xlam_fc_single_call --dataset-prefix xlam_fc_single_call`
+  - 当前结果：成功导出 `data/llamafactory/xlam_fc_single_call/*`
 - `BFCL_ROOT=/root/autodl-fs/tooluse-artifacts/external/gorilla/berkeley-function-call-leaderboard /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_bfcl_v4_single_turn_slice.py --config configs/bfcl_v4_single_turn/data.json`
   - 当前结果：写出 `data/interim/bfcl_v4_single_turn/{candidates.jsonl,audit.json}`
 - `/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py --config configs/bfcl_v4_single_turn/data.json`
@@ -134,6 +181,8 @@
   - 当前结果：迁移产物目录后重新训练与预测成功
 - `/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl --processed-jsonl data/processed/pilot_v1/test.jsonl --mode vanilla`
   - 当前结果：输出 exact tool-call 评估报告
+- `/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1 --output-dir results/local_2080ti/pilot_v1 --machine local_2080ti --experiment-group pilot_v1 --dataset pilot_v1 --include-generated-predictions`
+  - 当前结果：把轻量实验结果证据同步回仓库 `results/local_2080ti/pilot_v1`
 
 ## 本地实验状态
 
@@ -142,6 +191,9 @@
 详细记录：
 
 - `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
+- `results/local_2080ti/pilot_v1/README.md`
+- `results/local_2080ti/pilot_v1/manifest.json`
+- `results/local_2080ti/pilot_v1/commands.md`
 
 当前最重要的实验结论：
 
@@ -164,6 +216,95 @@
 - overfit sanity 检查通过：
   - `qwen25_05b_vanilla_overfit_trainbook_qlora` 达到 exact match `1/1`
   - 解释：坏结果来自 toy 数据泛化极限，而不是训练/导出/预测链路坏掉
+
+2026-04-14 新增的项目阶段判断：
+
+- 当前项目状态更准确地说是：
+  - `baseline runtime ready`
+  - `paper evidence not ready`
+- 当前最缺的不是再多跑 `pilot_v1`，而是：
+  - 真实 baseline 训练源
+  - 真实 held-out schema baseline 结果
+  - 真实可判决的 `reuse_main` / `A->B` / `shuffle/null` 接口
+- 相关记录：
+  - `docs/records/2026-04-14-paper-progress-and-next-steps.md`
+  - `docs/records/2026-04-14-external-paper-eval-synthesis.md`
+- 当前 `xLAM vanilla pilot1000` 真实运行状态：
+  - 配置：
+    - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
+  - run 目录：
+    - `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
+  - 当前状态：
+    - 训练已完成
+    - `train_loss=0.0520`
+    - `train_runtime=3255.909s`
+    - 预测仍在进行中，尚未落出最终 `generated_predictions.jsonl` / `predict_results.json`
+  - 2026-04-14 本轮最后一次观察：
+    - `launch.log` 已到 `2563/2570`
+    - 当前只启动了 `vanilla`
+    - `schema_augmented` 和 `hammer_like` 还未开始
+
+2026-04-14 新增的外部 challenge 整合判断：
+
+- 已把 `docs/fc_pdf/function-calling-paper-evaluation.md` 的核心判断整合进仓库记录：
+  - `schema_augmented` 只应视为强 baseline / recipe，不足以单独支撑当前 NeurIPS 2026 主线
+  - 当前主路线仍是：
+    - `C = schema-reusable decision representation`
+  - 当前 fallback 是：
+    - `B = held-out schema transfer / evaluation paper`
+- 当前采纳的 kill/go 工作判据：
+  - kill 倾向：
+    - best baseline retention `>= 0.93`
+    - 或 best baseline 关闭 `>= 80%` transfer gap
+  - go 倾向：
+    - `vanilla` 的 held-out gap `>= 12` 个点
+    - 且最强 baseline 仍保留 `>= 6~8` 个点 gap
+- 当前主协议进一步收紧为：
+  - `reuse_main` 的主证明应优先采用 `decoder` 不看原始 `x` 的 fixed-`d` `A->B` schema swap
+  - `shuffle/null` controls 不是可选项
+- 相关记录：
+  - `docs/records/2026-04-14-external-paper-eval-synthesis.md`
+
+2026-04-14 新增的数据侧进展：
+
+- 已基于真实本地文件跑通 `xLAM function-calling-60k` 的单轮 single-answer ingest / audit / export
+- 当前支持解析：
+  - `id`
+  - `query`
+  - `tools`
+  - `answers`
+- 真实全量文件观察到的额外事实：
+  - 顶层 payload 是 `list[60000]`
+  - `id` 是整数，不是字符串
+  - `tools` 与 `answers` 是字符串化 JSON
+- 当前接入范围故意收窄为：
+  - 单轮正例
+  - 多工具池可保留
+  - 但只接受单个 ground-truth tool call
+- 为了兼容真实全量数据，已补一个极窄修复：
+  - `xLAM` 的整数型 `id` 现在会被统一转成字符串 `sample_id`
+- 当前结果是：
+  - `accepted=25711`
+  - `rejected=34289`
+  - `train=20588`
+  - `dev=2553`
+  - `test=2570`
+- 已新增首批 real-data pilot 配置：
+  - `vanilla`
+  - `schema_augmented`
+  - `hammer_like`
+  - 当前统一采用 `1000 steps` 的 `pilot1000` 口径，先做真实数据 bring-up，再决定完整训练预算
+- 2026-04-14 当前正在运行的 real-data baseline：
+  - `USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
+  - 输出目录：`/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
+- 相关记录：
+  - `docs/records/2026-04-14-xlam-fc60k-ingest-audit.md`
+
+当前新增的协作约束：
+
+- 如果后续推进中确实需要更强的外部方案扩展或纠偏，可以先整理一份高质量 prompt 给用户去问 `GPT-5.4-pro`
+- 但这条路径只用于补充判断，不替代本仓库内的实现、实验和文档更新
+- 外部检索默认优先看 `2025` 年及以后的资料；如果引用更早材料，优先保留高影响力或官方来源
 
 2026-04-13 新增的工程结论：
 
@@ -244,6 +385,11 @@
 - `reuse_main` 的真实训练实现仍未确定
 - 方法侧实现如果未来回归，必须明确与 baseline runtime 分离
 
+补充说明：
+
+- 当前 `scripts/eval_counterfactual.py` 仍然只是占位聚合器，不代表表 R 已经可跑
+- 在真实训练源和 held-out baseline 结果稳定前，不要先写方法结论
+
 ## 开源仓库约束
 
 这个仓库要按后续 release 的开源项目维护。
@@ -251,6 +397,7 @@
 - 不要把 conda 环境放在仓库目录里
 - 不要把 editable 第三方源码 checkout 放在仓库目录里
 - 不要把 checkpoint、预测文件、loss 图等重产物默认写进仓库目录
+- 需要提交可复现实验证据时，统一写进 `results/`，而不是散落在根目录
 - 基线路径尽量复用成熟工具，当前优先复用 `LLaMA-Factory`
 
 ## 当前 source of truth
@@ -276,8 +423,10 @@
 ## 下一步建议
 
 1. 优先检查 `Salesforce/xlam-function-calling-60k` 是否能无损映射到当前 paired-schema 流水线。
-2. 如果 `xLAM/APIGen` 可用，先把它接成 baseline 训练源。
-3. 把 `BFCL` 保持为 benchmark / eval slice，不要先把 benchmark 和训练源混在一起。
-4. 继续用 `LLaMA-Factory` 跑 baseline，不要回头扩手写 trainer。
-5. 对所有后续预测输出统一跑 exact tool-call evaluator，不再用 BLEU/ROUGE 代替函数调用正确性。
-6. 只有 baseline 训练源和 held-out benchmark 分工稳定后，才讨论 `reuse_main` 的训练实现。
+2. 当前这一步已经完成：
+   - `xLAM` full-data ingest / paired / export 已经跑通
+3. 现在直接进入 real-data baseline 阶段，优先把 `vanilla / schema_augmented / hammer_like` 拆到不同机器上推进。
+4. 把 `BFCL` 保持为 benchmark / eval slice，不要先把 benchmark 和训练源混在一起。
+5. 继续用 `LLaMA-Factory` 跑 baseline，不要回头扩手写 trainer。
+6. 对所有后续预测输出统一跑 exact tool-call evaluator，不再用 BLEU/ROUGE 代替函数调用正确性。
+7. 只有真实 held-out baseline 结果成立后，才讨论 `reuse_main` 与表 R 的实现。

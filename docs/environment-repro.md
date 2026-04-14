@@ -1,5 +1,9 @@
 # 环境复现与新机恢复
 
+如果你现在只想要“最短命令链”，先看：
+
+- `docs/new-machine-quickstart.md`
+
 这份文档是给“新机器上自己手动恢复环境并开始跑实验”的。
 
 默认前提现在改成两层：
@@ -215,7 +219,7 @@ git -C /root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory checkout 436d26b
 
 当前预期：
 
-- `pytest`: `23 passed`
+- `pytest`: `29 passed`
 - `check_train_env.py`: `ready_for_real_training = true`
 
 ## 当前依赖文件

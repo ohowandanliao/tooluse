@@ -1,0 +1,13 @@
+{
+  "input_path": "$XLAM_FC_ROOT/xlam_function_calling_60k.json",
+  "source_benchmark": "xlam_function_calling_60k_single_call",
+  "candidate_output_path": "data/interim/xlam_fc_single_call/candidates.jsonl",
+  "audit_report_path": "data/interim/xlam_fc_single_call/audit.json",
+  "processed_dir": "data/processed/xlam_fc_single_call",
+  "split_seed": 11,
+  "train_ratio": 0.8,
+  "dev_ratio": 0.1,
+  "test_ratio": 0.1,
+  "split_group_strategy": "semantic_task",
+  "require_single_answer": true
+}

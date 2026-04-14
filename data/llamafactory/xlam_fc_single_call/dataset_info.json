@@ -1,0 +1,74 @@
+{
+  "xlam_fc_single_call_hammer_like_eval": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_hammer_like_eval.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_hammer_like_test": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_hammer_like_test.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_hammer_like_train": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_hammer_like_train.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_schema_augmented_eval": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_schema_augmented_eval.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_schema_augmented_test": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_schema_augmented_test.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_schema_augmented_train": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_schema_augmented_train.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_vanilla_eval": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_vanilla_eval.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_vanilla_test": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_vanilla_test.json",
+    "formatting": "sharegpt"
+  },
+  "xlam_fc_single_call_vanilla_train": {
+    "columns": {
+      "messages": "conversations",
+      "tools": "tools"
+    },
+    "file_name": "xlam_fc_single_call_vanilla_train.json",
+    "formatting": "sharegpt"
+  }
+}

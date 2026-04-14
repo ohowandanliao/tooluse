@@ -1,0 +1,44 @@
+model_name_or_path: Qwen/Qwen2.5-0.5B-Instruct
+trust_remote_code: true
+quantization_bit: 4
+quantization_method: bnb
+
+stage: sft
+do_train: true
+do_predict: true
+predict_with_generate: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+dataset_dir: data/llamafactory/xlam_fc_single_call
+dataset: xlam_fc_single_call_schema_augmented_train
+eval_dataset: xlam_fc_single_call_schema_augmented_test
+template: qwen
+cutoff_len: 1024
+max_samples: 100000
+overwrite_cache: true
+preprocessing_num_workers: 2
+dataloader_num_workers: 0
+
+output_dir: /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_schema_augmented_qlora_pilot1000
+logging_steps: 10
+save_steps: 250
+save_total_limit: 2
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: true
+report_to: none
+
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+max_steps: 1000
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+fp16: true
+ddp_timeout: 180000000
+
+per_device_eval_batch_size: 1
+eval_strategy: "no"
+max_new_tokens: 128

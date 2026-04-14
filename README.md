@@ -14,6 +14,8 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
   policy
 - `STATUS.md`: current implementation/runtime status
 - `HANDOFF.md`: cross-machine and cross-session handoff
+- `results/README.md`: in-repo experiment evidence bundles
+- `docs/new-machine-quickstart.md`: shortest path for bringing up a new machine and starting training
 - `docs/environment-repro.md`: how to rebuild the validated environment on a new machine
 - `docs/README.md`: document map by role
 
@@ -39,7 +41,10 @@ Use a Python 3.11 environment outside the repo. The currently validated local
 environment on this machine is `/root/miniconda3/envs/tooluse-llf`.
 
 If you are restoring on a new machine without Codex, read
-`docs/environment-repro.md` first and prefer the repo-side bootstrap script:
+`docs/new-machine-quickstart.md` first. For the full recovery version, read
+`docs/environment-repro.md`.
+
+Bootstrap entry:
 
 ```bash
 bash scripts/bootstrap_train_env.sh --help
@@ -53,11 +58,34 @@ bash scripts/bootstrap_train_env.sh --help
 /root/miniconda3/envs/tooluse-llf/bin/python scripts/check_train_env.py
 ```
 
+Build the current real-data baseline source from a local xLAM dump:
+
+```bash
+XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
+  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py \
+  --config configs/xlam_fc_single_call/data.json
+
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+  --config configs/xlam_fc_single_call/data.json
+
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+  --processed-dir data/processed/xlam_fc_single_call \
+  --output-dir data/llamafactory/xlam_fc_single_call \
+  --dataset-prefix xlam_fc_single_call
+```
+
 Local 2080 Ti bring-up example:
 
 ```bash
 USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
+```
+
+Current xLAM pilot example:
+
+```bash
+USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+  configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml
 ```
 
 Evaluate exact function-call correctness from a LLaMA-Factory prediction file:
@@ -69,14 +97,28 @@ Evaluate exact function-call correctness from a LLaMA-Factory prediction file:
   --mode vanilla
 ```
 
+Copy lightweight run evidence back into the repo:
+
+```bash
+/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py \
+  --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1 \
+  --output-dir results/local_2080ti/pilot_v1 \
+  --machine local_2080ti \
+  --experiment-group pilot_v1 \
+  --dataset pilot_v1 \
+  --include-generated-predictions
+```
+
 ## Artifact Policy
 
 Treat this repo as releaseable open-source code, not as a scratch directory.
 
 - Keep conda environments outside the repo.
 - Keep editable third-party checkouts outside the repo.
-- Keep checkpoints, generated predictions, and plots outside the repo whenever
-  possible.
+- Keep checkpoints and other heavy artifacts outside the repo.
+- Keep lightweight experiment evidence in-repo under `results/`:
+  commands, scalar metrics, exact-eval outputs, logs, and small prediction dumps
+  when they remain lightweight.
 - The current local artifact root is `/root/autodl-fs/tooluse-artifacts`.
 
 ## Repository Map
@@ -89,6 +131,7 @@ Treat this repo as releaseable open-source code, not as a scratch directory.
   draft.
 - `configs/`: data and training configs.
 - `scripts/`: data build, export, evaluation, and training entrypoints.
+- `results/`: committed experiment evidence bundles without weights.
 - `src/schema_reuse/`: library code for data, export, models, and evaluation.
 - `tests/`: regression tests for export, training utilities, and evaluation.
 - `docs/README.md`: document index and archive policy.

@@ -1,0 +1,93 @@
+{
+  "metrics": {
+    "argument_key_exact_match_rate": 1.0,
+    "argument_value_exact_match_rate": 0.0,
+    "count": 2,
+    "exact_match_by_schema_variant": {
+      "A": 0.0,
+      "B": 0.0
+    },
+    "exact_match_by_transform_family": {
+      "rename_arg_reorder": 0.0
+    },
+    "exact_match_count": 0,
+    "exact_match_rate": 0.0,
+    "name_match_rate": 1.0,
+    "parsed_prediction_count": 2,
+    "parsed_prediction_rate": 1.0
+  },
+  "predictions": [
+    {
+      "alias_split": "test",
+      "argument_key_exact_match": true,
+      "argument_value_exact_match": false,
+      "exact_match": false,
+      "expected_argument_keys": [
+        "arrival_city",
+        "departure_city"
+      ],
+      "expected_tool_name": "train_book",
+      "index": 0,
+      "name_match": true,
+      "predicted_call": {
+        "arguments": {
+          "arrival_city": "Beijing",
+          "departure_city": "Hangzhou"
+        },
+        "name": "train_book"
+      },
+      "prediction_parse_error": null,
+      "prediction_parsed": true,
+      "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"Tool schema for train_book.\", \"name\": \"train_book\", \"parameters\": {\"properties\": {\"arrival_city\": {\"description\": \"Argument `arrival_city`.\", \"type\": \"string\"}, \"departure_city\": {\"description\": \"Argument `departure_city`.\", \"type\": \"string\"}}, \"required\": [\"arrival_city\", \"departure_city\"], \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\nBook me a train from Beijing to Hangzhou.<|im_end|>\n<|im_start|>assistant\n",
+      "reference_call": {
+        "arguments": {
+          "arrival_city": "Hangzhou",
+          "departure_city": "Beijing"
+        },
+        "name": "train_book"
+      },
+      "schema_name": "train_book",
+      "schema_variant": "A",
+      "semantic_task_id": "task_079d92a155ae",
+      "source_benchmark": "toy_seed",
+      "transform_family": "rename_arg_reorder",
+      "user": "Book me a train from Beijing to Hangzhou."
+    },
+    {
+      "alias_split": "test",
+      "argument_key_exact_match": true,
+      "argument_value_exact_match": false,
+      "exact_match": false,
+      "expected_argument_keys": [
+        "test_arg_0000",
+        "test_arg_0001"
+      ],
+      "expected_tool_name": "test_tool_0000",
+      "index": 1,
+      "name_match": true,
+      "predicted_call": {
+        "arguments": {
+          "test_arg_0000": "北京",
+          "test_arg_0001": "杭州"
+        },
+        "name": "test_tool_0000"
+      },
+      "prediction_parse_error": null,
+      "prediction_parsed": true,
+      "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"Tool schema for test_tool_0000.\", \"name\": \"test_tool_0000\", \"parameters\": {\"properties\": {\"test_arg_0000\": {\"description\": \"Argument `test_arg_0000`.\", \"type\": \"string\"}, \"test_arg_0001\": {\"description\": \"Argument `test_arg_0001`.\", \"type\": \"string\"}}, \"required\": [\"test_arg_0001\", \"test_arg_0000\"], \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\nBook me a train from Beijing to Hangzhou.<|im_end|>\n<|im_start|>assistant\n",
+      "reference_call": {
+        "arguments": {
+          "test_arg_0000": "Beijing",
+          "test_arg_0001": "Hangzhou"
+        },
+        "name": "test_tool_0000"
+      },
+      "schema_name": "test_tool_0000",
+      "schema_variant": "B",
+      "semantic_task_id": "task_079d92a155ae",
+      "source_benchmark": "toy_seed",
+      "transform_family": "rename_arg_reorder",
+      "user": "Book me a train from Beijing to Hangzhou."
+    }
+  ]
+}
