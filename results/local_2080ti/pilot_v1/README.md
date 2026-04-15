@@ -21,7 +21,7 @@
 
 仓库外完整产物根目录：
 
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1`
+- `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1`
 
 ## 当前结论
 

@@ -64,10 +64,11 @@
 - 文档不能只写给当前操作者看，也要写给未来的开源用户和接手开发者看。
 - 目录命名、文件命名、运行命令和路径约束都要可解释、可复现、可清理。
 
-当前本机约定：
+当前推荐约定：
 
-- Python 环境：`/root/miniconda3/envs/tooluse-llf`
-- 重产物根目录：`/root/autodl-fs/tooluse-artifacts`
+- Python 环境名：`tooluse-llf`
+- 重产物根目录：repo 外的 `ARTIFACT_ROOT`
+- 推荐放法：仓库同级目录，例如 `../tooluse-artifacts`
 
 ### 原则四：不确定的东西先查外部做法，再决定是否推进
 

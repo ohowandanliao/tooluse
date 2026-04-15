@@ -12,17 +12,36 @@ Treat the repo as releaseable source code.
 - Keep editable third-party checkouts outside the repo.
 - Keep training outputs outside the repo whenever possible.
 
-Current validated local paths on this machine:
+Recommended runtime variables:
 
-- env: `/root/miniconda3/envs/tooluse-llf`
-- artifact root: `/root/autodl-fs/tooluse-artifacts`
-- editable `LLaMA-Factory` checkout:
-  `/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
+- `CONDA_BASE`
+- `ENV_NAME`
+- `ARTIFACT_ROOT`
+- `XLAM_FC_ROOT`
 
 ## Export Baseline Datasets
 
+The data flow has three layers:
+
+- raw / official source data
+- processed repo-internal JSONL under `data/processed/...`
+- exported `LLaMA-Factory` datasets under `data/llamafactory/...`
+
+The boundary is:
+
+- repo-side build scripts create `data/processed/...`
+- repo-side export scripts convert `data/processed/...` into `data/llamafactory/...`
+- `llamafactory-cli train` consumes `data/llamafactory/...` for both training and its built-in prediction stage
+- repo-side exact evaluation consumes `generated_predictions.jsonl` plus `data/processed/.../test.jsonl`
+
+Current practical repo state:
+
+- the checked-in xLAM baseline runs train directly from `data/llamafactory/xlam_fc_single_call/...`
+- a fresh clone does not need the full processed split directory just to start training
+- the extra file needed for repo-side exact evaluation is `data/processed/xlam_fc_single_call/test.jsonl`
+
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/pilot_v1 \
   --output-dir data/llamafactory/pilot_v1
 ```
@@ -50,10 +69,12 @@ BFCL-derived slice, move them back to the proper `*_eval` datasets.
 Examples:
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_vanilla_sft_lora.yaml
-/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_schema_augmented_sft_lora.yaml
-/root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train configs/llamafactory/qwen_hammer_like_lora.yaml
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train configs/llamafactory/qwen_vanilla_sft_lora.yaml
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train configs/llamafactory/qwen_schema_augmented_sft_lora.yaml
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train configs/llamafactory/qwen_hammer_like_lora.yaml
 ```
+
+These runs read exported datasets from `data/llamafactory/...`, not directly from `data/processed/...`.
 
 ## Current Scope
 
@@ -81,14 +102,14 @@ Machine-specific configs added for that path:
 - `configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml`
 - `configs/llamafactory/local_qwen25_05b_vanilla_overfit_trainbook_qlora.yaml`
 
-These machine-specific configs now write to:
+These machine-specific configs are expected to write outside the repo, for example:
 
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/...`
+- `$ARTIFACT_ROOT/runs/local_2080ti/...`
 
 Example:
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
 ```
 
@@ -99,11 +120,17 @@ Do not rely on BLEU or ROUGE for function-calling evaluation.
 Use the repo-side evaluator:
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py \
-  --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/eval_llamafactory_predictions.py \
+  --predictions "$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl" \
   --processed-jsonl data/processed/pilot_v1/test.jsonl \
   --mode vanilla
 ```
+
+Important boundary:
+
+- `generated_predictions.jsonl` comes from `LLaMA-Factory`
+- `--processed-jsonl` is only for repo-side gold metadata / exact evaluation
+- it is not the dataset consumed by `llamafactory-cli train`
 
 The report includes:
 

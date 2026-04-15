@@ -54,10 +54,11 @@
 - conda 环境、第三方 editable checkout、checkpoint、预测输出、图表等重产物都放仓库外。
 - 文档不能只写给当前操作者看，也要让未来外部用户和接手者看得懂。
 
-当前本机约定：
+当前推荐约定：
 
-- Python 环境：`/root/miniconda3/envs/tooluse-llf`
-- 重产物根目录：`/root/autodl-fs/tooluse-artifacts`
+- Python 环境名：`tooluse-llf`
+- 重产物根目录：repo 外的 `ARTIFACT_ROOT`
+- 推荐放法：仓库同级目录，例如 `../tooluse-artifacts`
 
 ### 原则四：不确定的东西先查外部做法，再决定是否推进
 
@@ -127,7 +128,7 @@
 ### 环境与路径
 
 - 不要在仓库目录里单独再放一套 conda。
-- 优先使用机器已有的 `/root/miniconda3`。
+- 优先使用机器已有的 conda 根目录。
 - pip 安装如果慢，可以用国内源。
 - 代码拿到新机器后，应该能在没有 Codex 的情况下靠仓库文档快速恢复环境并开始实验。
 - 所以依赖版本、第三方 runtime commit、验证命令和路径约定，必须写进仓库。

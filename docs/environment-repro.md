@@ -28,11 +28,11 @@
 
 ### 当前路径约定
 
-- conda 环境：`/root/miniconda3/envs/tooluse-llf`
-- 仓库：`/autodl-fs/data/tooluse`
-- 重产物根目录：`/root/autodl-fs/tooluse-artifacts`
+- conda 环境名：`tooluse-llf`
+- 仓库：任意 repo 路径
+- 重产物根目录：repo 外的 `ARTIFACT_ROOT`
 - 外置 `LLaMA-Factory` checkout：
-  - `/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
+  - `$ARTIFACT_ROOT/external/LLaMA-Factory`
 
 ### 当前已验证关键版本
 
@@ -172,10 +172,18 @@ bash scripts/bootstrap_train_env.sh --help
 
 如果你不想跑脚本，也可以手动按下面顺序走：
 
+### 0. 推荐先设变量
+
+```bash
+export CONDA_BASE="${CONDA_BASE:-$(conda info --base)}"
+export ENV_NAME="${ENV_NAME:-tooluse-llf}"
+export ARTIFACT_ROOT="${ARTIFACT_ROOT:-../tooluse-artifacts}"
+```
+
 ### 1. 创建 conda 环境
 
 ```bash
-/root/miniconda3/bin/conda create -n tooluse-llf python=3.11 -y
+"$CONDA_BASE/bin/conda" create -n "$ENV_NAME" python=3.11 -y
 ```
 
 ### 2. 安装 torch
@@ -185,13 +193,13 @@ bash scripts/bootstrap_train_env.sh --help
 例如：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/pip install torch torchvision torchaudio
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" pip install torch torchvision torchaudio
 ```
 
 ### 3. 安装 repo 依赖
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/pip install \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" pip install \
   -r requirements/train-server-validated.txt \
   -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
@@ -199,22 +207,22 @@ bash scripts/bootstrap_train_env.sh --help
 ### 4. 安装外置 LLaMA-Factory
 
 ```bash
-git clone https://github.com/hiyouga/LlamaFactory.git /root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory
-git -C /root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory checkout 436d26bc28b7c6422c89b63064c5a87e258ed73e
-/root/miniconda3/envs/tooluse-llf/bin/pip install -e /root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory
+git clone https://github.com/hiyouga/LlamaFactory.git "$ARTIFACT_ROOT/external/LLaMA-Factory"
+git -C "$ARTIFACT_ROOT/external/LLaMA-Factory" checkout 436d26bc28b7c6422c89b63064c5a87e258ed73e
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" pip install -e "$ARTIFACT_ROOT/external/LLaMA-Factory"
 ```
 
 ### 5. 安装本仓库
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/pip install -e .
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" pip install -e .
 ```
 
 ### 6. 运行验证
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/check_train_env.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python -m pytest -q
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/check_train_env.py
 ```
 
 当前预期：
@@ -247,9 +255,9 @@ git -C /root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory checkout 436d26b
 为了减轻系统盘压力，建议在新机器上也继续外置缓存：
 
 ```bash
-export HF_HOME=/root/autodl-fs/tooluse-artifacts/cache/huggingface
-export MODELSCOPE_CACHE=/root/autodl-fs/tooluse-artifacts/cache/modelscope
-export PIP_CACHE_DIR=/root/autodl-fs/tooluse-artifacts/cache/pip
+export HF_HOME="$ARTIFACT_ROOT/cache/huggingface"
+export MODELSCOPE_CACHE="$ARTIFACT_ROOT/cache/modelscope"
+export PIP_CACHE_DIR="$ARTIFACT_ROOT/cache/pip"
 export USE_MODELSCOPE_HUB=1
 ```
 

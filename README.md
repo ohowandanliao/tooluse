@@ -16,6 +16,7 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 - `HANDOFF.md`: cross-machine and cross-session handoff
 - `results/README.md`: in-repo experiment evidence bundles
 - `docs/new-machine-quickstart.md`: shortest path for bringing up a new machine and starting training
+  including multi-machine experiment assignment and `pilot2000` extras
 - `docs/environment-repro.md`: how to rebuild the validated environment on a new machine
 - `docs/README.md`: document map by role
 
@@ -37,12 +38,20 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 
 ## Quickstart
 
-Use a Python 3.11 environment outside the repo. The currently validated local
-environment on this machine is `/root/miniconda3/envs/tooluse-llf`.
+Use a Python 3.11 environment outside the repo.
 
 If you are restoring on a new machine without Codex, read
 `docs/new-machine-quickstart.md` first. For the full recovery version, read
 `docs/environment-repro.md`.
+
+Shell variables used below:
+
+```bash
+export CONDA_BASE="${CONDA_BASE:-$(conda info --base)}"
+export ENV_NAME="${ENV_NAME:-tooluse-llf}"
+export ARTIFACT_ROOT="${ARTIFACT_ROOT:-../tooluse-artifacts}"
+export XLAM_FC_ROOT="${XLAM_FC_ROOT:-$ARTIFACT_ROOT/external/xlam}"
+```
 
 Bootstrap entry:
 
@@ -51,48 +60,58 @@ bash scripts/bootstrap_train_env.sh --help
 ```
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_pilot_slice.py --config configs/pilot_v1/data.yaml
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/check_train_env.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python -m pytest -q
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_pilot_slice.py --config configs/pilot_v1/data.yaml
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/check_train_env.py
 ```
 
 Build the current real-data baseline source from a local xLAM dump:
 
 ```bash
-XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
-  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py \
+XLAM_FC_ROOT="$XLAM_FC_ROOT" \
+  "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_xlam_fc_single_call_slice.py \
   --config configs/xlam_fc_single_call/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_paired_dataset.py \
   --config configs/xlam_fc_single_call/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/xlam_fc_single_call \
   --output-dir data/llamafactory/xlam_fc_single_call \
   --dataset-prefix xlam_fc_single_call
 ```
 
+Meaning:
+
+- `data/processed/xlam_fc_single_call`: repo-internal processed rows
+- `data/llamafactory/xlam_fc_single_call`: actual `LLaMA-Factory` train/predict input
+
+Current practical note:
+
+- a fresh clone can start xLAM baseline training from `data/llamafactory/xlam_fc_single_call`
+- repo-side exact evaluation still needs `data/processed/xlam_fc_single_call/test.jsonl`
+
 Local 2080 Ti bring-up example:
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
 ```
 
 Current xLAM pilot example:
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml
 ```
 
 Evaluate exact function-call correctness from a LLaMA-Factory prediction file:
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py \
-  --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/eval_llamafactory_predictions.py \
+  --predictions "$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl" \
   --processed-jsonl data/processed/pilot_v1/test.jsonl \
   --mode vanilla
 ```
@@ -100,8 +119,8 @@ Evaluate exact function-call correctness from a LLaMA-Factory prediction file:
 Copy lightweight run evidence back into the repo:
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py \
-  --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1 \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/summarize_run_results.py \
+  --run-root "$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1" \
   --output-dir results/local_2080ti/pilot_v1 \
   --machine local_2080ti \
   --experiment-group pilot_v1 \
@@ -119,7 +138,8 @@ Treat this repo as releaseable open-source code, not as a scratch directory.
 - Keep lightweight experiment evidence in-repo under `results/`:
   commands, scalar metrics, exact-eval outputs, logs, and small prediction dumps
   when they remain lightweight.
-- The current local artifact root is `/root/autodl-fs/tooluse-artifacts`.
+- A recommended artifact-root convention is a repo-adjacent directory such as
+  `../tooluse-artifacts`.
 
 ## Repository Map
 

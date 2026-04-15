@@ -22,12 +22,14 @@
 当前已收录：
 
 - `local_2080ti/pilot_v1`
+- `local_2080ti/xlam_fc_single_call`
+- `repro_4090d`
 
 刷新一组结果证据包的示例命令：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/summarize_run_results.py \
-  --run-root /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1 \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/summarize_run_results.py \
+  --run-root "$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1" \
   --output-dir results/local_2080ti/pilot_v1 \
   --machine local_2080ti \
   --experiment-group pilot_v1 \
@@ -37,5 +39,5 @@
 
 约束：
 
-- 权重和其它重产物继续放在 `/root/autodl-fs/tooluse-artifacts`。
+- 权重和其它重产物继续放在 repo 外的 `ARTIFACT_ROOT`。
 - 仓库内的 `results/` 负责保存“证明实验确实跑过”的轻量证据。

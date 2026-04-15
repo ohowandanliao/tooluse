@@ -131,6 +131,8 @@
 - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
 - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_schema_augmented_qlora_pilot1000.yaml`
 - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_hammer_like_qlora_pilot1000.yaml`
+- `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_schema_augmented_qlora_pilot2000.yaml`
+- `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_hammer_like_qlora_pilot2000.yaml`
 - `scripts/build_bfcl_v4_single_turn_slice.py`
 - `scripts/build_xlam_fc_single_call_slice.py`
 - `configs/bfcl_v4_single_turn/data.json`
@@ -147,20 +149,26 @@
 - 实验结果证据入口看 `results/README.md`
 - 新机器恢复路径看 `docs/environment-repro.md`
 - 如果只想最短开跑路径，先看 `docs/new-machine-quickstart.md`
-  - 里面已经补了 `vanilla / schema_augmented / hammer_like` 的训练与评测命令
-  - 当前默认建议是“每台机器只跑一个 baseline 配方”，不要把三条都堆到同一台新机器上
+  - 现在已经改成变量化写法，减少固定绝对路径
+  - 也明确写清了 `processed`、`llamafactory`、exact evaluator 三层数据边界
+  - 还补了“新机器训练完后要回传哪些文件”
+  - 当前仓库状态是：训练直接用已提交的 `data/llamafactory/xlam_fc_single_call/`，exact evaluator 只额外依赖 `data/processed/xlam_fc_single_call/test.jsonl`
+- `docs/new-machine-quickstart.md` 现在已经合并了：
+  - 新机器恢复
+  - 多机实验分工
+  - `epoch-matched 补充实验`
+  - `pilot2000` 可直接运行配置
 - 文档地图看 `docs/README.md`
 
 ## 当前本地环境
 
 这台机器上已经有验证通过的环境：
 
-- env 路径：`/root/miniconda3/envs/tooluse-llf`
-- 本机产物根目录：`/root/autodl-fs/tooluse-artifacts`
-- editable `LLaMA-Factory` checkout：`/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
+- env 名称：`tooluse-llf`
+- 本机产物根目录约定：repo 外的 `ARTIFACT_ROOT`
+- editable `LLaMA-Factory` checkout：`$ARTIFACT_ROOT/external/LLaMA-Factory`
 - 2026-04-12 可用的下载回退：`USE_MODELSCOPE_HUB=1`
-- bring-up 时使用的本地 backbone cache：
-  - `/root/.cache/modelscope/hub/models/Qwen/Qwen2___5-0___5B-Instruct`
+- bring-up 时使用了 machine-local `ModelScope` backbone cache
 
 这个环境的已验证版本：
 
@@ -180,7 +188,7 @@
 - editable `LLaMA-Factory` checkout 和 run 目录迁到仓库外后，已经重新跑过一次 `local_qwen25_05b_vanilla_overfit_trainbook_qlora`
 - 结果仍然是训练成功、预测成功、exact tool-call `1/1`
 - 2026-04-13 还额外 clone 了官方 `gorilla` 仓库到：
-  - `/root/autodl-fs/tooluse-artifacts/external/gorilla`
+  - `$ARTIFACT_ROOT/external/gorilla`
   - 这里只用于读取官方 `BFCL` 数据和评测实现，不在仓库内提交
 - 2026-04-13 已补充新机器恢复文档和精确依赖文件：
   - `docs/environment-repro.md`
@@ -254,7 +262,7 @@
 - multi-call / parallel-call 不是这一步的主线，后续是否扩展要看 real-data baseline 结果
 - 2026-04-14 当前已经起了一条 real-data run：
   - config：`configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
-  - output：`/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
+  - output：`$ARTIFACT_ROOT/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
   - 这条 run 现在已经完成训练、预测和 exact evaluator，并已同步轻量结果到 `results/`
 
 ## 当前 xLAM baseline 运行进度
@@ -264,7 +272,7 @@
 - 配置：
   - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
 - run 目录：
-  - `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
+  - `$ARTIFACT_ROOT/runs/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000`
 
 截至 2026-04-14 本轮最后一次观察：
 
@@ -283,27 +291,90 @@
 - 轻量结果证据已同步回仓库：
   - `results/local_2080ti/xlam_fc_single_call/manifest.json`
   - `results/local_2080ti/xlam_fc_single_call/qwen25_05b_vanilla_qlora_pilot1000/`
-- 当前没有并行开第二个 xLAM baseline：
-  - `schema_augmented` 未启动
-  - `hammer_like` 未启动
+- 2026-04-14 新增运行分工：
+  - 本机已启动 `hammer_like`
+  - 新机器优先跑 `schema_augmented`
+  - 这样避免两台机器重复同一个 baseline
+- 2026-04-14 已收到新机器 `repro_4090d` 的 `schema_augmented` 结果包，并在主仓库补跑了 exact evaluator：
+  - 用户备注：`this run predicted on test; use as bring-up only`
+  - `train_loss=0.0481`
+  - `train_runtime=861.9397s`
+  - `predict_runtime=5612.8664s`
+  - `parsed_prediction_rate=0.9934`
+  - `exact_match_rate=0.7751`
+  - `exact_match_count=3984/5140`
+  - `name_match_rate=0.9934`
+  - `argument_key_exact_match_rate=0.8710`
+  - `argument_value_exact_match_rate=0.7751`
+  - `exact_match_by_schema_variant`：
+    - `A=0.8066`
+    - `B=0.7436`
+  - 当前文件落点：
+    - `results/repro_4090d/train_results.json`
+    - `results/repro_4090d/predict_results.json`
+    - `results/repro_4090d/generated_predictions.jsonl`
+    - `results/repro_4090d/trainer_log.jsonl`
+    - `results/repro_4090d/toolcall_eval.json`
+- 2026-04-15 本机 `hammer_like` 已完成训练、预测和 exact evaluator：
+  - 配置：
+    - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_hammer_like_qlora_pilot1000.yaml`
+  - `train_loss=0.0507`
+  - `train_runtime=3174.4367s`
+  - `predict_runtime=21940.6574s`
+  - `parsed_prediction_rate=0.9914`
+  - `exact_match_rate=0.7749`
+  - `exact_match_count=3983/5140`
+  - `name_match_rate=0.9914`
+  - `argument_key_exact_match_rate=0.8708`
+  - `argument_value_exact_match_rate=0.7749`
+  - `exact_match_by_schema_variant`：
+    - `A=0.8070`
+    - `B=0.7428`
+  - 当前文件落点：
+    - `results/local_2080ti/xlam_fc_single_call/manifest.json`
+    - `results/local_2080ti/xlam_fc_single_call/qwen25_05b_hammer_like_qlora_pilot1000/`
+- 2026-04-15 当前 direct baseline 的阶段性判断：
+  - `pilot1000` 预算下，`vanilla` 仍是最好
+  - `schema_augmented` 和 `hammer_like` 基本持平，都没有打过 `vanilla`
+  - 同口径 A 侧：
+    - `vanilla(A)=0.8105`
+    - `schema_augmented(A)=0.8066`
+    - `hammer_like(A)=0.8070`
+  - 但当前预算不完全公平：
+    - `vanilla epoch=0.3886`
+    - `schema_augmented epoch=0.1943`
+    - `hammer_like epoch=0.1943`
+  - 因此现在更合理的解读是：
+    - `schema_augmented` / `hammer_like` 在 bring-up 预算下没有显示优势
+    - 不该继续盲目堆新的 direct baseline
+    - 更合理的下一步是先补公平预算的 `epoch-matched 补充实验`
+- 2026-04-15 已把多机实验分工并入 `docs/new-machine-quickstart.md`：
+  - 当前已经标准化的补充实验只有两条：
+    - `schema_augmented pilot2000`
+    - `hammer_like pilot2000`
+  - 这两条就是现在最值得分到额外机器上的任务
 
 接手后优先动作：
 
 1. 基于 `vanilla exact_match_rate=0.8105` 判断 direct baseline 的真实强度。
-2. 如果有新机器，把 `schema_augmented` / `hammer_like` 拆到别的机器。
-3. 两个 direct baseline 跑完后，再判断 held-out gap 还剩多少。
+2. 把 `schema_augmented=0.7751` 和 `hammer_like=0.7749` 都视为 bring-up 证据，不要先当最终论文主结果。
+3. 现在优先按 `docs/new-machine-quickstart.md` 把：
+   - `schema_augmented pilot2000`
+   - `hammer_like pilot2000`
+   跑出来。
+4. 等这两条公平预算补充实验回来后，再决定是否进入 held-out transfer / `reuse_main`。
 
 ## 2026-04-12 实际跑过什么
 
 成功的本地 baseline run：
 
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora`
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora`
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora`
+- `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora`
+- `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora`
+- `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora`
 
 sanity overfit run：
 
-- `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora`
+- `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora`
 
 仓库内证据位置：
 
@@ -341,8 +412,8 @@ sanity overfit run：
 示例：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/eval_llamafactory_predictions.py \
-  --predictions /root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/eval_llamafactory_predictions.py \
+  --predictions "$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora/generated_predictions.jsonl" \
   --processed-jsonl data/processed/pilot_v1/test.jsonl \
   --mode vanilla
 ```
@@ -386,7 +457,7 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 ### 测试
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python -m pytest -q
 ```
 
 2026-04-12 删除手写 trainer 后的预期结果：
@@ -396,7 +467,7 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 ### baseline 导出
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py
 ```
 
 2026-04-12 的预期结果：
@@ -407,14 +478,14 @@ python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
 ### BFCL ingest
 
 ```bash
-BFCL_ROOT=/root/autodl-fs/tooluse-artifacts/external/gorilla/berkeley-function-call-leaderboard \
-  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_bfcl_v4_single_turn_slice.py \
+BFCL_ROOT="$BFCL_ROOT" \
+  "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_bfcl_v4_single_turn_slice.py \
   --config configs/bfcl_v4_single_turn/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_paired_dataset.py \
   --config configs/bfcl_v4_single_turn/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/bfcl_v4_single_turn \
   --output-dir data/llamafactory/bfcl_v4_single_turn \
   --dataset-prefix bfcl_v4_single_turn
@@ -429,14 +500,14 @@ BFCL_ROOT=/root/autodl-fs/tooluse-artifacts/external/gorilla/berkeley-function-c
 ### xLAM ingest
 
 ```bash
-XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
-  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py \
+XLAM_FC_ROOT="$XLAM_FC_ROOT" \
+  "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_xlam_fc_single_call_slice.py \
   --config configs/xlam_fc_single_call/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_paired_dataset.py \
   --config configs/xlam_fc_single_call/data.json
 
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/xlam_fc_single_call \
   --output-dir data/llamafactory/xlam_fc_single_call \
   --dataset-prefix xlam_fc_single_call
@@ -451,7 +522,7 @@ XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
 ### 训练环境探针
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/check_train_env.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/check_train_env.py
 ```
 
 2026-04-12 的预期结果：
@@ -480,13 +551,13 @@ XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
 ### 本地 GPU bring-up
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
 
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml
 
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml
 ```
 

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-04-14T17:02:05Z",
+  "machine": "repro_4090d",
+  "experiment_group": "xlam_fc_single_call",
+  "dataset": "xlam_fc_single_call",
+  "artifact_root": "/home/yixuan/project/tooluse-artifacts/runs/repro_4090d/xlam_fc_single_call",
+  "repo_bundle_root": "results/repro_4090d",
+  "include_generated_predictions": true,
+  "run_count": 1,
+  "runs": [
+    {
+      "run_name": "qwen25_05b_schema_augmented_qlora_pilot1000",
+      "mode": "schema_augmented",
+      "run_kind": "baseline_bringup",
+      "config_path": "configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_schema_augmented_qlora_pilot1000.yaml",
+      "artifact_path": "/home/yixuan/project/tooluse-artifacts/runs/repro_4090d/xlam_fc_single_call/qwen25_05b_schema_augmented_qlora_pilot1000",
+      "repo_bundle_path": "results/repro_4090d",
+      "copied_evidence_files": [
+        "train_results.json",
+        "predict_results.json",
+        "toolcall_eval.json",
+        "trainer_log.jsonl",
+        "generated_predictions.jsonl"
+      ],
+      "metrics": {
+        "toolcall": {
+          "count": 5140,
+          "parsed_prediction_count": 5106,
+          "parsed_prediction_rate": 0.9933852140077821,
+          "exact_match_count": 3984,
+          "exact_match_rate": 0.7750972762645915,
+          "name_match_rate": 0.9933852140077821,
+          "argument_key_exact_match_rate": 0.871011673151751,
+          "argument_value_exact_match_rate": 0.7750972762645915,
+          "exact_match_by_schema_variant": {
+            "A": 0.8066147859922179,
+            "B": 0.743579766536965
+          },
+          "exact_match_by_transform_family": {
+            "rename_arg_reorder": 0.7750972762645915
+          }
+        },
+        "train": {
+          "epoch": 0.19428793471925393,
+          "train_loss": 0.04809650798141956,
+          "train_runtime": 861.9397,
+          "train_samples_per_second": 9.281,
+          "train_steps_per_second": 1.16
+        },
+        "predict": {
+          "predict_runtime": 5612.8664,
+          "predict_samples_per_second": 0.916,
+          "predict_steps_per_second": 0.916,
+          "predict_bleu-4": 95.63425527237354,
+          "predict_rouge-1": 98.27925175097276,
+          "predict_rouge-2": 97.77275678988327,
+          "predict_rouge-l": 97.90760935797665
+        }
+      },
+      "conclusion": "Predicted on test; use as bring-up only."
+    }
+  ],
+  "summary": {
+    "best_exact_match_run": "qwen25_05b_schema_augmented_qlora_pilot1000",
+    "best_exact_match_rate": 0.7750972762645915,
+    "repo_policy": "Commit lightweight experiment evidence here, but keep weights and other heavy artifacts outside the repo."
+  }
+}

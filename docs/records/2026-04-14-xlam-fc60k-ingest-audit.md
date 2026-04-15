@@ -59,7 +59,7 @@ license 相关信息：
 
 当前实际使用的本地原始文件：
 
-- `/root/autodl-fs/tooluse-artifacts/external/xlam/xlam_function_calling_60k.json`
+- `$XLAM_FC_ROOT/xlam_function_calling_60k.json`
 
 真实文件结构确认如下：
 
@@ -170,7 +170,7 @@ license 相关信息：
 
 当前整仓测试结果：
 
-- `/root/miniconda3/envs/tooluse-llf/bin/python -m pytest -q`
+- `"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python -m pytest -q`
 - 结果：`29 passed`
 
 ## 真实全量运行结果
@@ -178,8 +178,8 @@ license 相关信息：
 ingest 命令：
 
 ```bash
-XLAM_FC_ROOT=/root/autodl-fs/tooluse-artifacts/external/xlam \
-  /root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py \
+XLAM_FC_ROOT="$XLAM_FC_ROOT" \
+  "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_xlam_fc_single_call_slice.py \
   --config configs/xlam_fc_single_call/data.json
 ```
 
@@ -229,25 +229,25 @@ paired dataset 结果：
 ## 下一步
 
 1. 真实本地原始数据文件已经到位：
-   - `/root/autodl-fs/tooluse-artifacts/external/xlam/xlam_function_calling_60k.json`
+   - `$XLAM_FC_ROOT/xlam_function_calling_60k.json`
 2. ingest 已完成：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_xlam_fc_single_call_slice.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_xlam_fc_single_call_slice.py \
   --config configs/xlam_fc_single_call/data.json
 ```
 
 3. paired dataset 已完成：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/build_paired_dataset.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/build_paired_dataset.py \
   --config configs/xlam_fc_single_call/data.json
 ```
 
 4. baseline 导出已完成：
 
 ```bash
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py \
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py \
   --processed-dir data/processed/xlam_fc_single_call \
   --output-dir data/llamafactory/xlam_fc_single_call \
   --dataset-prefix xlam_fc_single_call

@@ -14,9 +14,11 @@
    - 当前真实状态、已验证路径、下一步建议
 5. `../HANDOFF.md`
    - 新会话最短接手路径
-6. `../results/README.md`
+6. `new-machine-quickstart.md`
+   - 新机器恢复、多机实验分工、主实验与补充实验矩阵
+7. `../results/README.md`
    - 仓库内实验结果证据入口
-7. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+8. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
    - 当前论文主草稿
 
 ## 文档分层
@@ -39,7 +41,7 @@
 - `llamafactory-baseline.md`
   - baseline runtime 与 exact evaluator 使用说明
 - `new-machine-quickstart.md`
-  - 新机器最短安装与开跑路径
+  - 新机器最短安装与开跑路径，以及多机实验分工、baseline/补充实验矩阵、标准回传物
 - `environment-repro.md`
   - 新机器环境恢复、裸 Linux 安装脚本、镜像/快照策略
 - `../results/README.md`

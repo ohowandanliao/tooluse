@@ -24,15 +24,15 @@ Non-goals:
 
 Dedicated env:
 
-- `/root/miniconda3/envs/tooluse-llf`
+- `tooluse-llf`
 
 Artifact root:
 
-- `/root/autodl-fs/tooluse-artifacts`
+- repo 外的 `ARTIFACT_ROOT`
 
 Editable LLaMA-Factory checkout:
 
-- `/root/autodl-fs/tooluse-artifacts/external/LLaMA-Factory`
+- `$ARTIFACT_ROOT/external/LLaMA-Factory`
 
 Known-good versions:
 
@@ -61,26 +61,26 @@ Data pipeline:
 ```bash
 python3 scripts/build_pilot_slice.py --config configs/pilot_v1/data.yaml
 python3 scripts/build_paired_dataset.py --config configs/pilot_v1/data.yaml
-/root/miniconda3/envs/tooluse-llf/bin/python scripts/export_llamafactory_baselines.py
+"$CONDA_BASE/bin/conda" run -n "$ENV_NAME" python scripts/export_llamafactory_baselines.py
 ```
 
 Local baseline runs:
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_qlora.yaml
 
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_schema_augmented_qlora.yaml
 
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_hammer_like_qlora.yaml
 ```
 
 Sanity overfit:
 
 ```bash
-USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli train \
+USE_MODELSCOPE_HUB=1 "$CONDA_BASE/bin/conda" run -n "$ENV_NAME" llamafactory-cli train \
   configs/llamafactory/local_qwen25_05b_vanilla_overfit_trainbook_qlora.yaml
 ```
 
@@ -89,21 +89,21 @@ USE_MODELSCOPE_HUB=1 /root/miniconda3/envs/tooluse-llf/bin/llamafactory-cli trai
 Held-out toy runs:
 
 - `vanilla`
-  - output archive: `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora`
+  - output archive: `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_qlora`
   - exact-eval report: `toolcall_eval.json`
   - train loss: `0.0014169`
   - exact tool-call match: `0/1`
   - name match rate: `1.0`
   - argument-key match rate: `1.0`
 - `schema_augmented`
-  - output archive: `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora`
+  - output archive: `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_schema_augmented_qlora`
   - exact-eval report: `toolcall_eval.json`
   - train loss: `0.0094497`
   - exact tool-call match: `0/2`
   - name match rate: `1.0`
   - argument-key match rate: `1.0`
 - `hammer_like`
-  - output archive: `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora`
+  - output archive: `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_hammer_like_qlora`
   - exact-eval report: `toolcall_eval.json`
   - train loss: `0.0044566`
   - exact tool-call match: `0/2`
@@ -112,7 +112,7 @@ Held-out toy runs:
 
 Sanity overfit run:
 
-- output archive: `/root/autodl-fs/tooluse-artifacts/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora`
+- output archive: `$ARTIFACT_ROOT/runs/local_2080ti/pilot_v1/qwen25_05b_vanilla_overfit_trainbook_qlora`
 - exact-eval report: `toolcall_eval.json`
 - exact tool-call match: `1/1`
 - post-migration smoke rerun: success
