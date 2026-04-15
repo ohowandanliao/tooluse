@@ -18,8 +18,12 @@
    - 新机器恢复、多机实验分工、主实验与补充实验矩阵
 7. `../results/README.md`
    - 仓库内实验结果证据入口
-8. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
-   - 当前论文主草稿
+8. `records/2026-04-15-tool-bottleneck-pivot.md`
+   - 当前从 methods-first 转到 measurement-first 的路线重定义
+9. `fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
+   - 对外部 `pro` 返回结果的中文术语解读与案例说明
+10. `../2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+   - 旧的 methods-first 草稿，当前不再代表默认主线
 
 ## 文档分层
 
@@ -39,7 +43,7 @@
 ### 研究与运行
 
 - `llamafactory-baseline.md`
-  - baseline runtime 与 exact evaluator 使用说明
+  - baseline runtime、exact evaluator、baseline 命名口径说明
 - `new-machine-quickstart.md`
   - 新机器最短安装与开跑路径，以及多机实验分工、baseline/补充实验矩阵、标准回传物
 - `environment-repro.md`
@@ -56,6 +60,12 @@
   - `xLAM function-calling-60k` 的字段、license、真实全量 ingest 结果与当前边界
 - `records/2026-04-14-external-paper-eval-synthesis.md`
   - 外部 `GPT-5.4-pro` 论文评估结果的仓库内整合版，以及当前采纳的 kill/go 判据
+- `records/2026-04-15-tool-bottleneck-pivot.md`
+  - 当前新的 measurement-first 主线、旧路线的降级方式、已有资产如何复用
+- `fc_pdf/tool-function-bottleneck-analysis.md`
+  - 外部 `pro` 返回的 tool/function bottleneck 分析原文
+- `fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
+  - 上面那份分析的人话版、术语解释版
 - `records/pilot-v1-resource-estimate.md`
   - 算力和服务器需求估计
 

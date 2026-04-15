@@ -1,5 +1,18 @@
 # LLaMA-Factory Baselines
 
+This document is a runtime / baseline document.
+It is not the current paper's scientific claim document.
+
+As of 2026-04-15, the active paper direction has shifted to
+`measurement-first bottleneck attribution`:
+
+- separate `decision`
+- `interface-grounding`
+- `search/calibration`
+
+So the baselines described here should be read as engineering/runtime assets and
+measurement instruments, not as the paper's current headline method.
+
 The old handwritten baseline trainer path has been removed from this repo.
 Baseline SFT and QLoRA runs should go through `llamafactory-cli` on exported
 datasets.
@@ -78,13 +91,23 @@ These runs read exported datasets from `data/llamafactory/...`, not directly fro
 
 ## Current Scope
 
-- `vanilla_sft`: train on schema `T_A` only.
-- `schema_augmented_sft`: train on both `T_A` and `T_B`.
-- `hammer_like`: `schema_augmented_sft` plus irrelevant-tool injection in the
+- `vanilla_sft`: `A-only direct SFT`; train on schema `T_A` only.
+- `schema_augmented_sft`: `paired A+B direct SFT`; train on both `T_A` and
+  `T_B`.
+- `hammer_like`: `paired A+B direct SFT` plus irrelevant-tool injection in the
   tool list.
 
+Naming note:
+
+- `schema_augmented_sft` is a narrow baseline name in this repo
+- it does not mean arbitrary schema augmentation, paraphrase generation,
+  masking, or multi-stage reasoning
+- it specifically means paired `T_A / y_A` and `T_B / y_B` supervision in one
+  direct SFT pool
+
 The current `hammer_like` path is still a data-level approximation. It does not
-yet implement training-time name masking inside `LLaMA-Factory`.
+yet implement training-time name masking inside `LLaMA-Factory`, and it does
+not yet match the full `Hammer` recipe with irrelevance-focused training data.
 
 ## Local 2080 Ti Bring-Up
 

@@ -2,6 +2,18 @@
 
 这份文档面向“新机器尽快起一个 baseline”。
 
+先强调一句：
+
+- 这份文档服务的是 baseline runtime / bring-up
+- 不是当前论文主线的最终 scientific framing 文档
+- 截至 `2026-04-15`，当前论文主线已经切到
+  `measurement-first bottleneck attribution`
+- 所以这里的训练任务应理解为：
+  - baseline bring-up
+  - schema sensitivity instrument
+  - direct baseline reference
+  而不是默认的最终论文主结果
+
 目标只有三个：
 
 - 尽快把环境装起来；
@@ -194,6 +206,17 @@ XLAM_FC_ROOT="$XLAM_FC_ROOT" \
 - 新机器：`schema_augmented`
 
 如果你要跑别的模式，也可以改，但一定要先确认不要和别的机器撞车。
+
+这里的 mode 名字要按仓库内的窄口径理解：
+
+- `vanilla`：
+  - `A-only direct SFT`
+- `schema_augmented`：
+  - `paired A+B direct SFT`
+  - 不是泛指各种 schema augmentation recipe
+- `hammer_like`：
+  - `paired A+B direct SFT` + irrelevant-tool injection
+  - 目前只是 repo 内的近似版，不等于完整 `Hammer`
 
 先设置本机这次 run 的变量。
 

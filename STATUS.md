@@ -4,14 +4,53 @@
 
 ## 论文主线
 
-当前论文方向保持不变：
+2026-04-15 路线重定义：
 
-- `cross-schema decision reuse`
-- 只研究 `function calling`，不扩成通用 agent framework
-- 当前主线不做 `RL`
-- 当前主线不做 `execution-feedback posterior distillation`
+- 当前默认主线不再是 `methods-first schema-reusable decision representation`
+- 当前默认主线改为：
+  - `measurement-first bottleneck attribution`
+  - 核心问题是把 function-calling 失败拆成：
+    - `decision`
+    - `interface-grounding`
+    - `search/calibration`
+  - 当前更想先证明：
+    - `tool/function definition` 是否已经是 first-order bottleneck
+- `multi-turn / agent RL` 当前不再是第一篇主对象
+  - 现在只保留为后续 stress setting / amplification setting
+- 旧的 `decision reuse / reuse_main` 路线没有删除
+  - 但当前已经降级成：
+    - contingent route
+    - 只有在 measurement 结果说明 interface/transfer gap 仍明显时，才重新进入主线
 
-当前要验证的核心命题是：在 schema `T_A` 上学到的 decision object，能否在语义等价的 schema `T_B` 上复用。主要证据路径仍然是：
+这次路线变化的外部依据与解释见：
+
+- `docs/fc_pdf/tool-function-bottleneck-analysis.md`
+- `docs/fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
+- `docs/records/2026-04-15-tool-bottleneck-pivot.md`
+
+当前仓库仍然只研究：
+
+- `function calling / tool use`
+- 不扩成通用 agent framework
+
+当前默认不做：
+
+- `agent RL`
+- `execution-feedback posterior distillation`
+- `multi-turn` methods-first 主叙事
+
+当前第一优先级不再是直接证明 `A->B decision reuse`，
+而是先做更干净的问题识别。当前最重要的证据路径变成：
+
+- `semantically equivalent schema perturbation`
+- `oracle ladder`
+  - `decision`
+  - `tool identity`
+  - `canonical semantic slots / CIR`
+- `distractor / no-call / related-tool` stress
+- exact executable correctness 与 error taxonomy
+
+旧主线的协议要求仍保留为后续参考，不再是当前第一优先级：
 
 - `A->B` counterfactual decoding
 - `shuffle/null` 控制组
@@ -20,6 +59,9 @@
 主草稿：
 
 - `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+  - 当前更应视为旧的 methods-first 草稿，不再代表默认主线
+- `docs/records/2026-04-15-tool-bottleneck-pivot.md`
+  - 当前新的 measurement-first 路线说明
 
 项目原则与文档规范：
 
@@ -211,6 +253,20 @@
 
 当前最重要的实验结论：
 
+- 当前已有资产没有白做，但角色变了：
+  - paired-schema 数据构造链路：
+    - 现在更像 `schema perturbation instrument`
+  - exact evaluator：
+    - 现在更像 measurement 的 executable correctness 口径
+  - xLAM single-turn baseline runtime：
+    - 现在更像 direct baseline reference 和行为观察入口
+  - `schema_augmented` / `hammer_like` 结果：
+    - 现在更像 baseline reference，不再默认等于主方法证据
+- baseline 命名口径已经收窄：
+  - `vanilla = A-only direct SFT`
+  - `schema_augmented = paired A+B direct SFT`
+  - `hammer_like = paired A+B direct SFT + irrelevant-tool injection`
+  - 当前 `hammer_like` 不是完整 `Hammer`，不能直接当 faithful Hammer baseline 报告
 - runtime 路径已经是真实可用的：
   - `ModelScope` 下载可用
   - `2080 Ti 22GB` 可跑 `QLoRA`
@@ -243,6 +299,7 @@
 - 相关记录：
   - `docs/records/2026-04-14-paper-progress-and-next-steps.md`
   - `docs/records/2026-04-14-external-paper-eval-synthesis.md`
+  - `docs/records/2026-04-15-tool-bottleneck-pivot.md`
 - 当前 `xLAM vanilla pilot1000` 真实运行状态：
   - 配置：
     - `configs/llamafactory/local_qwen25_05b_xlam_fc_single_call_vanilla_qlora_pilot1000.yaml`
@@ -315,9 +372,48 @@
   - 当前仓库落点：
     - `results/local_2080ti/xlam_fc_single_call/manifest.json`
     - `results/local_2080ti/xlam_fc_single_call/qwen25_05b_hammer_like_qlora_pilot1000/`
+- 当前 `xLAM epoch-matched 补充实验` 已收到一组 `eval/dev` 结果：
+  - 这两条都不是 `test`，而是 `dev.jsonl` 展开后的 `5106` 条 prediction
+  - 当前仓库落点：
+    - `results/qwen25_05b_schema_augmented_qlora_pilot2000_evalfast4090d/`
+    - `results/qwen25_05b_hammer_like_qlora_pilot2000_evalfast4090d/`
+  - `schema_augmented pilot2000 eval/dev`：
+    - `train_loss=0.0433`
+    - `train_runtime=603.4344s`
+    - `predict_runtime=2304.3616s`
+    - `parsed_prediction_rate=0.9922`
+    - `exact_match_rate=0.7734`
+    - `exact_match_count=3949/5106`
+    - `name_match_rate=0.9920`
+    - `argument_key_exact_match_rate=0.8758`
+    - `argument_value_exact_match_rate=0.7736`
+    - `exact_match_by_schema_variant`：
+      - `A=0.7991`
+      - `B=0.7477`
+  - `hammer_like pilot2000 eval/dev`：
+    - `train_loss=0.0454`
+    - `train_runtime=805.8562s`
+    - `predict_runtime=2318.0628s`
+    - `parsed_prediction_rate=0.9898`
+    - `exact_match_rate=0.7724`
+    - `exact_match_count=3944/5106`
+    - `name_match_rate=0.9896`
+    - `argument_key_exact_match_rate=0.8766`
+    - `argument_value_exact_match_rate=0.7726`
+    - `exact_match_by_schema_variant`：
+      - `A=0.7951`
+      - `B=0.7497`
+  - 当前解读：
+    - `schema_augmented` 比 `hammer_like` 只高 `5` 个 exact 命中，基本仍然可以视为持平
+    - 两者都还保留明显的 `A > B` gap
+    - 由于这批是 `eval/dev` 而不是 `test`，当前不能和先前 `5140` 条的 `test` 结果直接混写成同一张最终表
 - 当前 direct baseline 的阶段性判断：
   - `pilot1000` 预算下，当前最好的是 `vanilla`
   - `schema_augmented` 与 `hammer_like` 基本持平，且都没有超过 `vanilla`
+  - 这里的 `schema_augmented` 与 `hammer_like` 都应按 repo 内窄定义理解：
+    - 前者是 `paired A+B direct SFT`
+    - 后者只是 `paired A+B` 上再加 irrelevant-tool injection
+    - 当前结果不能直接解释成“完整 Hammer 无效”
   - 同口径看 `A` 侧：
     - `vanilla(A)=0.8105`
     - `schema_augmented(A)=0.8066`
@@ -334,15 +430,23 @@
       - `hammer_like pilot2000`
     - 这轮补充实验的运行说明已经并入：
       - `docs/new-machine-quickstart.md`
+  - 2026-04-15 之后，这些 baseline 结果的默认角色进一步调整为：
+    - runtime bring-up 证据
+    - direct baseline 参考
+    - schema/interface sensitivity 的先导观察
+  - 不再默认把它们视为当前第一篇 measurement 论文的核心证据
 
 2026-04-14 新增的外部 challenge 整合判断：
 
 - 已把 `docs/fc_pdf/function-calling-paper-evaluation.md` 的核心判断整合进仓库记录：
   - `schema_augmented` 只应视为强 baseline / recipe，不足以单独支撑当前 NeurIPS 2026 主线
-  - 当前主路线仍是：
+  - 这份较早的外部判断当时建议：
     - `C = schema-reusable decision representation`
-  - 当前 fallback 是：
-    - `B = held-out schema transfer / evaluation paper`
+  - 但截至 `2026-04-15`，当前仓库默认主线已经进一步切到：
+    - `measurement-first bottleneck attribution`
+  - 因此这里的 `C` 现在更应视为：
+    - secondary route / contingent route
+  - `B = held-out schema transfer / evaluation paper` 仍可保留为 measurement 侧 fallback
 - 当前采纳的 kill/go 工作判据：
   - kill 倾向：
     - best baseline retention `>= 0.93`

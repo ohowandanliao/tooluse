@@ -18,14 +18,42 @@
 4. `STATUS.md`
 5. `results/README.md`
 6. `results/local_2080ti/pilot_v1/README.md`
-7. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
-8. `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
-9. `docs/records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`
-10. `docs/records/2026-04-14-paper-progress-and-next-steps.md`
-11. `docs/records/2026-04-14-xlam-fc60k-ingest-audit.md`
-12. `docs/environment-repro.md`
-13. `docs/llamafactory-baseline.md`
-14. `docs/new-machine-quickstart.md`
+7. `docs/records/2026-04-15-tool-bottleneck-pivot.md`
+8. `docs/fc_pdf/tool-function-bottleneck-analysis.md`
+9. `docs/fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
+10. `2026-03-31-nips2026-function-calling-idea-draft-v2.md`
+11. `docs/records/2026-04-12-local-2080ti-qlora-bringup.md`
+12. `docs/records/2026-04-13-bfcl-usage-and-baseline-data-audit.md`
+13. `docs/records/2026-04-14-paper-progress-and-next-steps.md`
+14. `docs/records/2026-04-14-xlam-fc60k-ingest-audit.md`
+15. `docs/environment-repro.md`
+16. `docs/llamafactory-baseline.md`
+17. `docs/new-machine-quickstart.md`
+
+## 2026-04-15 新总判断
+
+先看一条新的总判断：
+
+- 当前默认主线已经从 `methods-first` 改成 `measurement-first`
+- 第一篇更适合写成：
+  - `single-turn`
+  - `semantic task fixed`
+  - `tool pool controlled`
+  - `causal measurement paper`
+- 当前首要问题不是“先做什么新方法”，而是：
+  - 当前 function-calling 失败主要来自：
+    - `decision`
+    - `interface-grounding`
+    - `search/calibration`
+    中的哪一类
+- `multi-turn / agent RL` 当前只保留为后续 stress setting
+  - 不再作为第一篇的默认主对象
+
+先读下面三份文档，再继续看本 handoff：
+
+1. `docs/fc_pdf/tool-function-bottleneck-analysis.md`
+2. `docs/fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
+3. `docs/records/2026-04-15-tool-bottleneck-pivot.md`
 
 ## 这个项目真正要证明什么
 
@@ -35,12 +63,21 @@
 - 把 `RL` 当标题方法
 - 把 feedback posterior distillation 当主贡献
 
-当前论文**是在做**：
+当前第一优先级论文**是在做**：
 
-- `schema-reusable decision representation`
-- 用 `A->B` counterfactual decoding 证明复用
-- 证明 `A->B > shuffle/null`
-- 检查收益能否在 held-out schema transform 下保留
+- `measurement-first bottleneck attribution`
+- 重点区分：
+  - `decision`
+  - `interface-grounding`
+  - `search/calibration`
+- 重点验证：
+  - `tool/function definition` 是否已经是 first-order bottleneck
+
+旧的 `schema-reusable decision representation` 当前仍在仓库里保留，但已经降为：
+
+- secondary route
+- contingent route
+- 只有在 measurement 结果说明 interface/transfer gap 仍明显时，才重新回到主线
 
 执行过程中必须同时遵守：
 
@@ -72,14 +109,20 @@
   - `paper evidence not ready`
 - 这条判断的完整解释见：
   - `docs/records/2026-04-14-paper-progress-and-next-steps.md`
+  - `docs/records/2026-04-15-tool-bottleneck-pivot.md`
 
 当前新增的外部 challenge 整合判断：
 
 - `docs/fc_pdf/function-calling-paper-evaluation.md` 的核心结论已经被吸收进仓库决策
 - 当前明确采纳：
   - `schema_augmented` 是强 baseline，不是主创新
-  - 主路线仍是 `C = schema-reusable decision representation`
-  - fallback 是 `B = held-out schema transfer / evaluation paper`
+  - 这份较早的外部判断当时建议：
+    - `C = schema-reusable decision representation`
+  - 但截至 `2026-04-15`，当前仓库默认主线已经进一步切到：
+    - `measurement-first bottleneck attribution`
+  - 因此这里的 `C` 现在更应视为：
+    - secondary route / contingent route
+  - `B = held-out schema transfer / evaluation paper` 仍可保留为 measurement 侧 fallback
 - 当前工作判据已经被收紧为：
   - kill 倾向：
     - best baseline retention `>= 0.93`
@@ -91,6 +134,20 @@
   - `shuffle/null` controls 不是可选项
 - 整合版记录见：
   - `docs/records/2026-04-14-external-paper-eval-synthesis.md`
+
+当前最新的外部 challenge 已进一步收束为：
+
+- 第一篇不建议直接做 `multi-turn / agent RL`
+- 第一篇更像 `single-turn causal measurement paper`
+- 最强的问题定义不再是“先提一个更强方法”
+- 而是先做：
+  - `oracle bottleneck decomposition`
+  - `interface invariance`
+  - `friendly/hostile schema`
+  - `related distractor / no-call`
+- 当前解释文档：
+  - `docs/fc_pdf/tool-function-bottleneck-analysis.md`
+  - `docs/fc_pdf/tool-function-bottleneck-analysis-interpretation.md`
 
 当前新增的数据侧判断：
 
@@ -109,6 +166,18 @@
   - `docs/records/2026-04-14-xlam-fc60k-ingest-audit.md`
 
 ## baseline 的实际 runtime 路径
+
+baseline 命名口径先统一：
+
+- `vanilla = A-only direct SFT`
+- `schema_augmented = paired A+B direct SFT`
+- `hammer_like = paired A+B direct SFT + irrelevant-tool injection`
+
+重要边界：
+
+- 当前 `schema_augmented` 不是泛指所有 schema augmentation recipe
+- 当前 `hammer_like` 不是 faithful `Hammer`
+- 当前仓库还没有补上完整 `Hammer` 所需的 irrelevance 数据配方和 training-time masking
 
 现在正确的 baseline 路径是：
 
@@ -336,6 +405,8 @@
 - 2026-04-15 当前 direct baseline 的阶段性判断：
   - `pilot1000` 预算下，`vanilla` 仍是最好
   - `schema_augmented` 和 `hammer_like` 基本持平，都没有打过 `vanilla`
+  - 这里不能直接读成“完整 Hammer 无效”
+  - 更准确地说，当前 repo 内的 `hammer_like` 近似版没有显示出优势
   - 同口径 A 侧：
     - `vanilla(A)=0.8105`
     - `schema_augmented(A)=0.8066`
@@ -348,6 +419,41 @@
     - `schema_augmented` / `hammer_like` 在 bring-up 预算下没有显示优势
     - 不该继续盲目堆新的 direct baseline
     - 更合理的下一步是先补公平预算的 `epoch-matched 补充实验`
+  - 2026-04-15 之后，这些 baseline 的角色进一步调整为：
+    - runtime bring-up
+    - direct reference baseline
+    - schema sensitivity 的先导观察
+  - 不再默认把它们视为当前第一篇主论文的核心证据
+- 2026-04-15 已收到一组 `evalfast4090d` 的 `pilot2000 eval/dev` 结果，并已在主仓库补跑 exact evaluator：
+  - 注意这批不是 `test`，而是 `dev.jsonl` 展开后的 `5106` 条 prediction
+  - `schema_augmented pilot2000 eval/dev`：
+    - `train_loss=0.0433`
+    - `train_runtime=603.4344s`
+    - `predict_runtime=2304.3616s`
+    - `parsed_prediction_rate=0.9922`
+    - `exact_match_rate=0.7734`
+    - `exact_match_count=3949/5106`
+    - `exact_match_by_schema_variant`：
+      - `A=0.7991`
+      - `B=0.7477`
+    - 文件落点：
+      - `results/qwen25_05b_schema_augmented_qlora_pilot2000_evalfast4090d/`
+  - `hammer_like pilot2000 eval/dev`：
+    - `train_loss=0.0454`
+    - `train_runtime=805.8562s`
+    - `predict_runtime=2318.0628s`
+    - `parsed_prediction_rate=0.9898`
+    - `exact_match_rate=0.7724`
+    - `exact_match_count=3944/5106`
+    - `exact_match_by_schema_variant`：
+      - `A=0.7951`
+      - `B=0.7497`
+    - 文件落点：
+      - `results/qwen25_05b_hammer_like_qlora_pilot2000_evalfast4090d/`
+  - 当前解读：
+    - `schema_augmented` 只比 `hammer_like` 高 `5` 个 exact 命中，仍基本持平
+    - 两者都没有消掉 `A > B` gap
+    - 这批结果只能当 `eval/dev` 选择依据，不能直接替代最终 `test` 结果
 - 2026-04-15 已把多机实验分工并入 `docs/new-machine-quickstart.md`：
   - 当前已经标准化的补充实验只有两条：
     - `schema_augmented pilot2000`

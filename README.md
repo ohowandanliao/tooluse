@@ -1,11 +1,18 @@
 # tooluse
 
-`tooluse` is a research codebase for NeurIPS 2026 function-calling experiments on
-schema-reusable decision representations.
+`tooluse` is a research codebase for NeurIPS 2026 function-calling experiments.
 
-The current question is narrow: can a decision learned under tool schema `T_A` be
-reused under an equivalent schema `T_B`? This repo is not trying to become a
-general agent framework, and the active baseline runtime is `LLaMA-Factory`.
+The current active paper direction is no longer "methods-first decision reuse".
+It is now a measurement-first question:
+
+- where do function-calling systems actually fail?
+- is the main bottleneck in `decision`, `interface-grounding`, or
+  `search/calibration`?
+- under clean single-turn settings, is tool/function interface definition
+  already a first-order bottleneck?
+
+This repo is not trying to become a general agent framework, and the active
+baseline runtime is still `LLaMA-Factory`.
 
 ## Documentation Entry Points
 
@@ -22,10 +29,15 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 
 ## Scope
 
-- Study `cross-schema decision reuse` for function calling.
-- Use `A->B` counterfactual decoding and `shuffle/null` controls as the main
-  evidence path.
-- Keep `RL` and execution-feedback distillation out of the current mainline.
+- Current active route: `measurement-first bottleneck attribution` for function
+  calling.
+- Main immediate question: separate `decision`, `interface-grounding`, and
+  `search/calibration` failures under controlled single-turn settings.
+- Keep `multi-turn`, `agent RL`, and execution-feedback distillation out of the
+  first paper's mainline.
+- The older `schema-reusable decision representation` direction is now treated
+  as a secondary route that only becomes worth revisiting if the measurement
+  results show a real unresolved interface/transfer gap.
 
 ## What Is In The Repo
 
@@ -35,6 +47,29 @@ general agent framework, and the active baseline runtime is `LLaMA-Factory`.
 - Baseline configs for `vanilla`, `schema_augmented`, and `hammer_like`.
 - Exact tool-call evaluation utilities for `generated_predictions.jsonl`.
 - The old handwritten baseline trainer path has been removed from the codebase.
+
+Current interpretation:
+
+- the existing paired-schema pipeline is still useful
+- but it should now be viewed primarily as an instrument for interface
+  sensitivity / schema-perturbation measurement
+- not as paper-ready evidence for a methods claim by itself
+
+## Baseline Naming
+
+The checked-in config names stay short for compatibility, but the intended
+meaning is narrower than the raw names suggest:
+
+- `vanilla`: `A-only direct SFT`
+- `schema_augmented`: `paired A+B direct SFT`, not a generic catch-all for
+  arbitrary schema augmentation recipes
+- `hammer_like`: `paired A+B direct SFT` plus irrelevant-tool injection only
+
+Important boundary:
+
+- the current `hammer_like` path is not a faithful reproduction of `Hammer`
+- it does not yet include `Hammer`'s full data recipe or training-time masking
+- do not report it as full `Hammer`; report it as a repo-local approximation
 
 ## Quickstart
 
@@ -162,5 +197,10 @@ Treat this repo as releaseable open-source code, not as a scratch directory.
 - The current `pilot_v1/dev.jsonl` split is empty.
 - The 2026-04-12 local QLoRA runs are engineering bring-up evidence, not paper
   evidence.
-- The training path for `reuse_main` is still unresolved and should not be
-  confused with the baseline runtime.
+- The current xLAM single-call slice is enough for baseline runtime bring-up,
+  but not yet enough for the full bottleneck-decomposition paper:
+  it still lacks the richer labels and controls needed for
+  `decision/interface/search` attribution.
+- The older `reuse_main` training path is still unresolved and should not be
+  confused with either the baseline runtime or the new measurement-first paper
+  direction.
